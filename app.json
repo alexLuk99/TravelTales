@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.alexluk.TravelTracker"
     },
     "web": {
       "bundler": "metro",
@@ -24,6 +25,13 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsVersion": "11.4.0",
+          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWxleGx1ayIsImEiOiJjbTNuMnR1Zm4xNzZxMnFxeWNuMzUxa2I1In0.sKWAC7xAR9CqS0BsoZehOg"
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -36,6 +44,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "91df3de2-3609-437b-aeca-04845b770a81"
+      }
+    },
+    "owner": "alexluk"
   }
 }
