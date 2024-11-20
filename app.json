@@ -29,7 +29,13 @@
         "@rnmapbox/maps",
         {
           "RNMapboxMapsVersion": "11.4.0",
-          "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWxleGx1ayIsImEiOiJjbTNuMnR1Zm4xNzZxMnFxeWNuMzUxa2I1In0.sKWAC7xAR9CqS0BsoZehOg"
+            "RNMapboxMapsDownloadToken": "sk.eyJ1IjoiYWxleGx1ayIsImEiOiJjbTNuMnR1Zm4xNzZxMnFxeWNuMzUxa2I1In0.sKWAC7xAR9CqS0BsoZehOg"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show current location on map."
         }
       ],
       [

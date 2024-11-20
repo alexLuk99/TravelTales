@@ -16,5 +16,5 @@ export default function HomeScreen() {
     <Stack.Screen options={{  title: 'Home' }} />
     <Map />
     </>
-  ); // Add closing parenthesis here
+  );
 }
