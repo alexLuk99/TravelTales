@@ -33,7 +33,7 @@ export default function Map() {
 
     return (
         <MapView style={{flex: 1}} styleURL="mapbox://styles/mapbox/standard">
-            <Camera followUserLocation />
+            <Camera followZoomLevel={2} followUserLocation />
             <LocationPuck />
         </MapView>  
     );
