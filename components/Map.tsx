@@ -3,7 +3,7 @@ import Mapbox, { Camera, LocationPuck, MapView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
 import { useEffect, useState } from "react";
 
-Mapbox.setAccessToken('pk.eyJ1IjoiYWxleGx1ayIsImEiOiJjbTNnMG1jbGkwMW01MmtzZmU5Z21nbW44In0.bjjCiA_ldA7KcQTK1qs1yg');
+Mapbox.setAccessToken(process.env.MAPBOX_ACCESS_TOKEN || '');
 
 export default function Map() {
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
@@ -32,8 +32,8 @@ export default function Map() {
     }
 
     return (
-        <MapView style={{flex: 1}} styleURL="mapbox://styles/mapbox/standard">
-            <Camera followZoomLevel={2} followUserLocation />
+        <MapView style={{flex: 1}} styleURL="mapbox://styles/mapbox/standard" projection="globe">
+            <Camera followZoomLevel={1} followUserLocation />
             <LocationPuck pulsing={{ isEnabled:true }}/>
         </MapView>  
     );
