@@ -10,8 +10,29 @@ export default function Map() {
     const { location, errorMsg } = useUserLocation();
     const fillLayerStyle = {
         fillColor: '#3bb2d0', // Globale Füllfarbe
-        fillOpacity: 0.5,    // Transparenz
+        fillOpacity: 0.7,    // Transparenz
     };
+    const filterWoldView = [
+            "all",
+            [
+                "==",
+                ["get", "disputed"],
+                "false"
+            ],
+            [
+                "any",
+                [
+                    "==",
+                    "all",
+                    ["get", "worldview"]
+                ],
+                [
+                    "in",
+                    "US",
+                    ["get", "worldview"]
+                ]
+            ]
+        ];
 
     let text = 'Waiting...';
     if (errorMsg) {
@@ -27,27 +48,7 @@ export default function Map() {
                     id="country-layer" 
                     sourceLayerID="country_boundaries" 
                     style={fillLayerStyle} 
-                    filter={[
-                        "all",
-                        [
-                          "==",
-                          ["get", "disputed"],
-                          "false"
-                        ],
-                        [
-                          "any",
-                          [
-                            "==",
-                            "all",
-                            ["get", "worldview"]
-                          ],
-                          [
-                            "in",
-                            "US",
-                            ["get", "worldview"]
-                          ]
-                        ]
-                      ]}
+                    filter={filterWoldView}
                 />
             </VectorSource>
             <Camera 
