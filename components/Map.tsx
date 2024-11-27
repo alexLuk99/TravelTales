@@ -18,7 +18,7 @@ export default function Map() {
                 ["in", "US", ["get", "worldview"]]
             ],
             ["==", ["get", "disputed"], "false"],
-            ['any', ['all', ['in', ['get', 'iso_3166_1_alpha_3'], ["DEU", "FRA"].flat()]]],
+            ['!',['in', ['get', 'iso_3166_1_alpha_3'], ["DEU", "FRA", "ITA"]]]
         ];
 
     let text = 'Waiting...';
