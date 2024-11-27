@@ -1,37 +1,24 @@
-import { Text, View } from "react-native";
-import Mapbox, { Camera, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
-import * as Location from 'expo-location';
-import { useEffect, useState } from "react";
+import Mapbox, { Camera, FillLayer, LocationPuck, MapView, RasterLayer, VectorSource } from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
+import { useState } from 'react';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
 export default function Map() {
     const { location, errorMsg } = useUserLocation();
+    const [visitedCountries, setVisitedCountries] = useState(["IT"]);
     const fillLayerStyle = {
-        fillColor: '#3bb2d0', // Globale Füllfarbe
-        fillOpacity: 0.7,    // Transparenz
+        fillColor: '#3bb2d0',
+        fillOpacity: 0.7,
     };
     const filterWoldView = [
             "all",
-            [
-                "==",
-                ["get", "disputed"],
-                "false"
+            ["any",
+                ["==", "all", ["get", "worldview"]],
+                ["in", "US", ["get", "worldview"]]
             ],
-            [
-                "any",
-                [
-                    "==",
-                    "all",
-                    ["get", "worldview"]
-                ],
-                [
-                    "in",
-                    "US",
-                    ["get", "worldview"]
-                ]
-            ]
+            ["==", ["get", "disputed"], "false"],
+            ['any', ['all', ['in', ['get', 'iso_3166_1_alpha_3'], ["DEU", "FRA"].flat()]]],
         ];
 
     let text = 'Waiting...';
