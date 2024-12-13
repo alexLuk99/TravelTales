@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { View, Text, Modal, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
+import MapComponent from './MapComponent';
+import useVisitedCountries from '../hooks/useVisitedCountries';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
@@ -23,7 +25,7 @@ export default function Map() {
         ],
     };
 
-    const filterWoldView = [
+    const filterWorldView = [
         "all",
         ["any",
             ["==", "all", ["get", "worldview"]],
@@ -76,32 +78,12 @@ export default function Map() {
 
     return (
         <View style={{ flex: 1 }}>
-            <MapView style={{ flex: 1 }} styleURL="mapbox://styles/mapbox/standard" projection="globe">
-                <VectorSource
-                    id="global-layer-source"
-                    url="mapbox://mapbox.country-boundaries-v1"
-                    onPress={(event) => {
-                        if (event.features && event.features.length > 0) {
-                            const properties = event.features[0].properties;
-                            if (properties) {
-                                handleCountryClick(properties.iso_3166_1_alpha_3, properties.name_en);
-                            }
-                        }
-                    }}
-                >
-                    <FillLayer
-                        id="country-layer"
-                        sourceLayerID="country_boundaries"
-                        style={fillLayerStyle}
-                        filter={filterWoldView}
-                    />
-                </VectorSource>
-                <Camera
-                    followZoomLevel={1}
-                    followUserLocation
-                />
-                <LocationPuck pulsing={{ isEnabled: true }} />
-            </MapView>
+            <MapComponent
+                visitedCountries={visitedCountries}
+                handleCountryClick={handleCountryClick}
+                fillLayerStyle={fillLayerStyle}
+                filterWorldView={filterWorldView}
+            />
             <CountryModal
                 isVisible={isModalVisible}
                 country={selectedCountry}
