@@ -5,7 +5,6 @@ import { View, Text, Modal, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
 import MapComponent from './MapComponent';
-import useVisitedCountries from '../hooks/useVisitedCountries';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
