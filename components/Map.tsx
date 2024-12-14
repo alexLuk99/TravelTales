@@ -1,16 +1,17 @@
 import Mapbox, { Camera, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
 import { useEffect, useState } from 'react';
-import { View, Text, Modal, Button } from 'react-native';
+import { View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
 import MapComponent from './MapComponent';
+import StatisticsComponent from './StatisticsComponent';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
 export default function Map() {
     const { location, errorMsg } = useUserLocation();
-    const [visitedCountries, setVisitedCountries] = useState([""]);
+    const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -18,9 +19,9 @@ export default function Map() {
         fillColor: '#3bb2d0',
         fillOpacity: [
             'case',
-            ['in', ['get', 'iso_3166_1_alpha_3'], ["literal", visitedCountries]],
-            0, // Kein Füllwert für besuchte Länder
-            0.7 // Füllwert für unbesuchte Länder
+            ['in', ['get', 'iso_3166_1_alpha_3'], ["literal", visitedCountries.length ? visitedCountries : ["NONE"]]],
+            0,
+            0.7
         ],
     };
 
@@ -90,6 +91,7 @@ export default function Map() {
                 dismiss={dismissModal}
                 visitedCountries={visitedCountries}
             />
+            <StatisticsComponent visitedCountries={visitedCountries} />
         </View>
     );
 }
