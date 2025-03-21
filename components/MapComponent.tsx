@@ -18,10 +18,11 @@ const MapComponent = ({ visitedCountries, handleCountryClick, fillLayerStyle, fi
             >
                 <FillLayer
                     id="country-layer"
+                    sourceID='global-layer-source'
                     sourceLayerID="country_boundaries"
                     style={fillLayerStyle}
                     filter={filterWorldView}
-                    aboveLayerID="waterway-label"
+                    belowLayerID="water"
                 />
             </VectorSource>
             <Camera followZoomLevel={1} followUserLocation />
