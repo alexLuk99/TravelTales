@@ -14,6 +14,8 @@ export default function Map() {
     const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [highlightedCountryCode, setHighlightedCountryCode] = useState<string | null>(null);
+
 
     const fillLayerStyle = {
         fillColor: '#3bb2d0',
@@ -60,11 +62,13 @@ export default function Map() {
     };
 
     const handleCountryClick = (countryCode: string, countryName: string) => {
+        setHighlightedCountryCode(countryCode);
         setSelectedCountry({ code: countryCode, name_en: countryName });
         setIsModalVisible(true);
     };
 
     const dismissModal = () => {
+        setHighlightedCountryCode(null);
         setIsModalVisible(false);
         setSelectedCountry(null);
     };
@@ -83,6 +87,7 @@ export default function Map() {
                 handleCountryClick={handleCountryClick}
                 fillLayerStyle={fillLayerStyle}
                 filterWorldView={filterWorldView}
+                highlightedCountryCode={highlightedCountryCode}
             />
             <CountryModal
                 isVisible={isModalVisible}

@@ -8,11 +8,11 @@ const StatisticsComponent = ({ visitedCountries }: { visitedCountries: string[] 
     <View style={styles.container}>
       <Text style={styles.header}>Visited Countries</Text>
       <Text style={styles.text}>Total Visited: {visitedCountries.length} / {TOTAL_COUNTRIES}</Text>
-      <View style={styles.list}>
+      {/* <View style={styles.list}>
         {visitedCountries.map((countryCode, index) => (
           <Text key={index} style={styles.text}>{countryCode}</Text>
         ))}
-      </View>
+      </View> */}
     </View>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import Mapbox, { Camera, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
-const MapComponent = ({ visitedCountries, handleCountryClick, fillLayerStyle, filterWorldView }: any) => {
+const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, highlightedCountryCode }: any) => {
     return (
         <MapView style={{ flex: 1 }} styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc" projection="globe" scaleBarEnabled={false}>
             <VectorSource
@@ -14,7 +14,8 @@ const MapComponent = ({ visitedCountries, handleCountryClick, fillLayerStyle, fi
                             handleCountryClick(properties.iso_3166_1_alpha_3, properties.name_en);
                         }
                     }
-                }}
+                }
+            }
             >
                 <FillLayer
                     id="country-layer"
@@ -24,6 +25,19 @@ const MapComponent = ({ visitedCountries, handleCountryClick, fillLayerStyle, fi
                     filter={filterWorldView}
                     belowLayerID="water"
                 />
+                {highlightedCountryCode && (
+                    <FillLayer
+                        id="highlight-layer"
+                        sourceID="country-boundaries"
+                        sourceLayerID="country_boundaries"
+                        style={{
+                            fillColor: '#fbb03b',
+                            fillOpacity: 1,
+                        }}
+                        filter={["==", ["get", "iso_3166_1_alpha_3"], highlightedCountryCode]}
+                        aboveLayerID="country-layer"
+                    />
+                )}
             </VectorSource>
             <Camera followZoomLevel={0.9} followUserLocation />
             <LocationPuck pulsing={{ isEnabled: true }} />
