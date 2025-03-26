@@ -3,7 +3,7 @@ import Mapbox, { Camera, FillLayer, LocationPuck, MapView, VectorSource } from '
 
 const MapComponent = ({ visitedCountries, handleCountryClick, fillLayerStyle, filterWorldView }: any) => {
     return (
-        <MapView style={{ flex: 1 }} styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc" projection="globe">
+        <MapView style={{ flex: 1 }} styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc" projection="globe" scaleBarEnabled={false}>
             <VectorSource
                 id="global-layer-source"
                 url="mapbox://mapbox.country-boundaries-v1"
@@ -18,14 +18,14 @@ const MapComponent = ({ visitedCountries, handleCountryClick, fillLayerStyle, fi
             >
                 <FillLayer
                     id="country-layer"
-                    sourceID='global-layer-source'
+                    sourceID="country-boundaries"
                     sourceLayerID="country_boundaries"
                     style={fillLayerStyle}
                     filter={filterWorldView}
                     belowLayerID="water"
                 />
             </VectorSource>
-            <Camera followZoomLevel={1} followUserLocation />
+            <Camera followZoomLevel={0.9} followUserLocation />
             <LocationPuck pulsing={{ isEnabled: true }} />
         </MapView>
     );

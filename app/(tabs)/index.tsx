@@ -7,12 +7,13 @@ import { ThemedView } from '@/components/ThemedView';
 import Mapbox from '@rnmapbox/maps';
 import { Stack } from 'expo-router';
 import Map from '@/components/Map';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   return (
-    <>
-    <Stack.Screen options={{  title: 'Home' }} />
-    <Map />
-    </>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Stack.Screen options={{  title: 'Home' }} />
+      <Map />
+    </SafeAreaView>
   );
 }

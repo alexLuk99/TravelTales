@@ -1,4 +1,4 @@
-import Mapbox, { Camera, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
+import Mapbox, { Camera, FillExtrusionLayer, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
