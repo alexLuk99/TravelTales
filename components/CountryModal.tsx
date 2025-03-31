@@ -7,12 +7,18 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
     return (
         <Modal
             isVisible={isVisible}
+            animationIn="slideInDown"
+            animationOut="slideOutUp"
             hasBackdrop={false}
             coverScreen={false}
-            onBackdropPress={dismiss}
-            backdropOpacity={0}
-            useNativeDriver
-            hideModalContentWhileAnimating
+            hideModalContentWhileAnimating = {true}
+            // onBackdropPress={dismiss}
+            onBackButtonPress = {dismiss}
+            onSwipeComplete={dismiss}
+            swipeDirection="up"
+            swipeThreshold={60}
+            // backdropOpacity={0.3}
+            useNativeDriver={false}
             style={styles.modalWrapper}
         >
             <View style={styles.modal}>
@@ -37,17 +43,17 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
 
 const styles = StyleSheet.create({
     modalWrapper: {
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         margin: 0,
-        pointerEvents: 'box-none', // 👈 Wichtig: erlaubt Klicks "durch" das Modal hindurch
+        pointerEvents: 'auto',
       },
       modal: {
         backgroundColor: 'white',
         padding: 20,
-        borderRadius: 10,
-        width: '80%',
-        pointerEvents: 'box-only', // Nur Modal-Inhalt fängt Klicks ab
+        borderRadius: 0,
+        width: '100%',
+        pointerEvents: 'auto', 
       },
       modalTitle: {
         fontSize: 18,

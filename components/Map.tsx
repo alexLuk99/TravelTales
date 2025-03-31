@@ -69,8 +69,8 @@ export default function Map() {
 
     const dismissModal = () => {
         setHighlightedCountryCode(null);
-        setIsModalVisible(false);
         setSelectedCountry(null);
+        setIsModalVisible(false);
     };
 
     let text = 'Waiting...';
