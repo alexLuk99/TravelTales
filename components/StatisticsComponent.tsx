@@ -21,8 +21,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    marginTop: 10,
   },
   header: {
     fontSize: 18,

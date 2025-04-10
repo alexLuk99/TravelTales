@@ -1,7 +1,23 @@
-import React from 'react';
-import Mapbox, { Camera, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
+import React, { useRef } from 'react';
+import Mapbox, { Camera, FillLayer, LocationPuck, MapView, ShapeSource, VectorSource } from '@rnmapbox/maps';
 
-const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, highlightedCountryCode }: any) => {
+const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible  }: any) => {
+
+    const highlightLayerStyle = {
+        fillColor: '#fbb03b',
+        fillOpacity: 1,
+      };
+
+      const highlightFilter = [
+      "all",
+      ["any", ["==", "all", ["get", "worldview"]], ["in", "US", ["get", "worldview"]]],
+      ["==", ["get", "disputed"], "false"],
+      country?.code
+        ? ['==', ['get', 'iso_3166_1_alpha_3'], country.code]
+        : ['==', ['get', 'iso_3166_1_alpha_3'], '']
+    ];
+
+
     return (
         <MapView style={{ flex: 1 }} styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc" projection="globe" scaleBarEnabled={false}>
             <VectorSource
@@ -14,8 +30,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, hig
                             handleCountryClick(properties.iso_3166_1_alpha_3, properties.name_en);
                         }
                     }
-                }
-            }
+                }}
             >
                 <FillLayer
                     id="country-layer"
@@ -25,19 +40,13 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, hig
                     filter={filterWorldView}
                     belowLayerID="water"
                 />
-                {highlightedCountryCode && (
                     <FillLayer
                         id="highlight-layer"
                         sourceID="country-boundaries"
                         sourceLayerID="country_boundaries"
-                        style={{
-                            fillColor: '#fbb03b',
-                            fillOpacity: 1,
-                        }}
-                        filter={["==", ["get", "iso_3166_1_alpha_3"], highlightedCountryCode]}
-                        aboveLayerID="country-layer"
+                        style={highlightLayerStyle}
+                        filter={highlightFilter}
                     />
-                )}
             </VectorSource>
             <Camera followZoomLevel={0.9} followUserLocation />
             <LocationPuck pulsing={{ isEnabled: true }} />

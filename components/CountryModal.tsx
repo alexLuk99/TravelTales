@@ -11,14 +11,14 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
             animationOut="slideOutUp"
             hasBackdrop={false}
             coverScreen={false}
-            hideModalContentWhileAnimating = {true}
+            // hideModalContentWhileAnimating = {true}
             // onBackdropPress={dismiss}
             onBackButtonPress = {dismiss}
             onSwipeComplete={dismiss}
-            swipeDirection="up"
-            swipeThreshold={60}
+            // swipeDirection="up"
+            // swipeThreshold={60}
             // backdropOpacity={0.3}
-            useNativeDriver={false}
+            // useNativeDriver={false}
             style={styles.modalWrapper}
         >
             <View style={styles.modal}>
@@ -26,11 +26,11 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
                 Have you visited {country.name_en}?
                 </Text>
                 <Button
-                title={
-                    visitedCountries.includes(country.code)
-                    ? 'Mark as Unvisited'
-                    : 'Mark as Visited'
-                }
+                    title={
+                        visitedCountries.includes(country.code)
+                        ? 'Mark as Unvisited'
+                        : 'Mark as Visited'
+                    }
                 onPress={() => {
                     toggleVisited(country.code);
                     dismiss();

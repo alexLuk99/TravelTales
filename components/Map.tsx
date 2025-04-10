@@ -1,4 +1,4 @@
-import Mapbox, { Camera, FillExtrusionLayer, FillLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
+import Mapbox from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -14,8 +14,6 @@ export default function Map() {
     const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [highlightedCountryCode, setHighlightedCountryCode] = useState<string | null>(null);
-
 
     const fillLayerStyle = {
         fillColor: '#3bb2d0',
@@ -50,6 +48,11 @@ export default function Map() {
         loadVisitedCountries();
     }, []);
 
+    const dismissModal = () => {
+        setSelectedCountry(null);
+        setIsModalVisible(false);
+    };
+
     const toggleVisitedCountry = async (countryCode: string) => {
         let updatedCountries;
         if (visitedCountries.includes(countryCode)) {
@@ -62,15 +65,8 @@ export default function Map() {
     };
 
     const handleCountryClick = (countryCode: string, countryName: string) => {
-        setHighlightedCountryCode(countryCode);
         setSelectedCountry({ code: countryCode, name_en: countryName });
         setIsModalVisible(true);
-    };
-
-    const dismissModal = () => {
-        setHighlightedCountryCode(null);
-        setSelectedCountry(null);
-        setIsModalVisible(false);
     };
 
     let text = 'Waiting...';
@@ -87,7 +83,8 @@ export default function Map() {
                 handleCountryClick={handleCountryClick}
                 fillLayerStyle={fillLayerStyle}
                 filterWorldView={filterWorldView}
-                highlightedCountryCode={highlightedCountryCode}
+                country={selectedCountry}
+                isModalVisible={isModalVisible}
             />
             <CountryModal
                 isVisible={isModalVisible}
