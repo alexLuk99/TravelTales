@@ -5,20 +5,19 @@ import Modal from 'react-native-modal';
 const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCountries }: any) => 
     { if (!country) return null;
     return (
+
         <Modal
             isVisible={isVisible}
             animationIn="slideInDown"
             animationOut="slideOutUp"
             hasBackdrop={false}
             coverScreen={false}
-            // hideModalContentWhileAnimating = {true}
-            // onBackdropPress={dismiss}
+            hideModalContentWhileAnimating = {true}
             onBackButtonPress = {dismiss}
             onSwipeComplete={dismiss}
-            // swipeDirection="up"
-            // swipeThreshold={60}
-            // backdropOpacity={0.3}
-            // useNativeDriver={false}
+            swipeDirection="up"
+            swipeThreshold={60}
+            useNativeDriver={true}
             style={styles.modalWrapper}
         >
             <View style={styles.modal}>

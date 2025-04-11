@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import Mapbox, { Camera, FillLayer, LocationPuck, MapView, ShapeSource, VectorSource } from '@rnmapbox/maps';
+import Mapbox, { Camera, FillLayer, LineLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
 const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible  }: any) => {
 
@@ -16,7 +16,6 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
         ? ['==', ['get', 'iso_3166_1_alpha_3'], country.code]
         : ['==', ['get', 'iso_3166_1_alpha_3'], '']
     ];
-
 
     return (
         <MapView style={{ flex: 1 }} styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc" projection="globe" scaleBarEnabled={false}>
@@ -46,7 +45,20 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
                         sourceLayerID="country_boundaries"
                         style={highlightLayerStyle}
                         filter={highlightFilter}
+                        belowLayerID="water"
                     />
+                    <LineLayer
+                        id="highlight-border-layer"
+                        sourceID="country-boundaries"
+                        sourceLayerID="country_boundaries"
+                        style={{
+                            lineColor: 'black',
+                            lineWidth: 1,
+                            lineOpacity: 1
+                        }}
+                        filter={highlightFilter}
+                        aboveLayerID="water"
+                        />
             </VectorSource>
             <Camera followZoomLevel={0.9} followUserLocation />
             <LocationPuck pulsing={{ isEnabled: true }} />
