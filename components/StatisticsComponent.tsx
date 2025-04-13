@@ -6,33 +6,42 @@ const TOTAL_COUNTRIES = 195;
 const StatisticsComponent = ({ visitedCountries }: { visitedCountries: string[] }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Visited Countries</Text>
-      <Text style={styles.text}>Total Visited: {visitedCountries.length} / {TOTAL_COUNTRIES}</Text>
-      {/* <View style={styles.list}>
-        {visitedCountries.map((countryCode, index) => (
-          <Text key={index} style={styles.text}>{countryCode}</Text>
-        ))}
-      </View> */}
-    </View>
-  );
+    <Text style={styles.label}>Countries Visited:</Text>
+    <Text style={styles.visitedText}>
+      <Text style={styles.visitedNumber}>{visitedCountries.length}</Text>
+      <Text style={styles.totalText}> / {TOTAL_COUNTRIES}</Text>
+    </Text>
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    backgroundColor: '#f9f9f9',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,         // Reduziertes vertikales Padding
+    paddingHorizontal: 16,       // Reduziertes horizontales Padding
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Einheitlicher Hintergrund wie im Modal (leicht weiß, halbtransparent)
+    borderRadius: 8,            // Leicht abgerundete Ecken (ähnlich wie im Modal)
   },
-  header: {
-    fontSize: 18,
+  label: {
+    fontSize: 16,
+    color: 'rgba(0, 0, 0, 0.8)', // Für ein gehaltvolleres Theme, z.B. dunkler Text statt hell, je nach Gesamt-Theme
+    marginRight: 10,            // Etwas mehr Abstand, damit der Text nicht zu nah an der Zahl ist
+    fontWeight: 'light',
+  },
+  visitedText: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  visitedNumber: {
+    fontSize: 26,               // Etwas kleinere Schrift, damit das Component kompakter wird
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#3bb2d0',           // Farbe passend zur Karte (z.B. Wasserblau)
   },
-  text: {
-    fontSize: 14,
-    color: '#333',
-  },
-  list: {
-    marginTop: 10,
+  totalText: {
+    fontSize: 18,
+    color: 'rgba(0, 0, 0, 0.6)', // Leicht abgeschwächter Text, der nicht vom Wesentlichen ablenkt
   },
 });
 

@@ -1,11 +1,20 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet, TouchableWithoutFeedback, TouchableOpacity  } from 'react-native';
 import Modal from 'react-native-modal';
+import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
 
-const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCountries, hideCloseButton, hideModal }: any) => 
+const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCountries, hideCloseButton }: any) => 
     { if (!country) return null;
         const visited = visitedCountries.includes(country.code);
+
+        function countryCodeToEmoji(countryCode: string) {
+          return countryCode.toUpperCase().replace(/./g, char =>
+            String.fromCodePoint(127397 + char.charCodeAt(0))
+          );
+        }
+
     return (
+      console.log(country.iso_3166_1),
         <Modal
             isVisible={isVisible}
             animationIn="slideInDown"
@@ -24,27 +33,30 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
             style={styles.modalWrapper}
         >
             <View style={styles.modal}>
-                <Text style={styles.modalTitle}>{country.name_en}</Text>
-                <View style={styles.checkboxContainer}>
-                    <Text style={styles.checkboxLabel}>Visited:</Text>
-                    <TouchableOpacity
-                        style={styles.checkbox}
-                        onPress={() => {
-                            toggleVisited(country.code);
-                            dismiss();
-                        }}
-                    >
-                        {/* Zeige ein Häkchen, wenn visited true ist, sonst leer */}
-                        <Text style={styles.checkboxText}>{visited ? '✓' : ''}</Text>
-                    </TouchableOpacity>
-                </View>
-                {!hideCloseButton && (
-                  <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
-                    <Text style={styles.topCloseButtonText}>×</Text>
-                  </TouchableOpacity>
-                )}
-            </View>
-        </Modal>
+        {/* Flag-Emoji anzeigen */}
+        <Text style={styles.flagEmoji}>
+          {countryCodeToEmoji(country.iso_3166_1)}
+        </Text>
+        <Text style={styles.modalTitle}>{country.name_en}</Text>
+        <View style={styles.checkboxContainer}>
+          <Text style={styles.checkboxLabel}>Visited:</Text>
+          <TouchableOpacity
+            style={styles.checkbox}
+            onPress={() => {
+              toggleVisited(country.code);
+              dismiss();
+            }}
+          >
+            <Text style={styles.checkboxText}>{visited ? '✓' : ''}</Text>
+          </TouchableOpacity>
+        </View>
+        {!hideCloseButton && (
+          <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
+            <Text style={styles.topCloseButtonText}>×</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </Modal>
     );
 };
 
@@ -54,6 +66,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 0,
     pointerEvents: 'auto',
+  },
+  flagEmoji: {
+    fontSize: 48,        // Größe des Emoji
+    marginBottom: 10,
+    textAlign: 'center',
   },
   checkboxContainer: {
     flexDirection: 'row', 
@@ -77,7 +94,7 @@ const styles = StyleSheet.create({
     color: '#3bb2d0',           // z. B. Wasser-Blau wie in deinem fillLayerStyle
   },
   modal: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     padding: 2,
     borderRadius: 0,   // Leichte Abrundung für ein moderneres Design
     width: '100%',       // Nimmt 90% der Bildschirmbreite ein, also weniger als den ganzen Screen

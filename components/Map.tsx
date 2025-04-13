@@ -12,7 +12,7 @@ Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 export default function Map() {
     const { location, errorMsg } = useUserLocation();
     const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
-    const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string } | null>(null);
+    const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     const fillLayerStyle = {
@@ -64,12 +64,12 @@ export default function Map() {
         await AsyncStorage.setItem('visitedCountries', JSON.stringify(updatedCountries));
     };
 
-    const handleCountryClick = (countryCode: string, countryName: string) => {
+    const handleCountryClick = (countryCode: string, countryName: string, countryCodeAlpha2: string) => {
         if (selectedCountry && selectedCountry.code === countryCode) {
             setIsModalVisible(false);
             setSelectedCountry(null);
           } else {
-            setSelectedCountry({ code: countryCode, name_en: countryName });
+            setSelectedCountry({ code: countryCode, name_en: countryName, iso_3166_1: countryCodeAlpha2 });
             setIsModalVisible(true);
           }
         };
@@ -99,7 +99,9 @@ export default function Map() {
                 dismiss={dismissModal}
                 visitedCountries={visitedCountries}
             />
-            <StatisticsComponent visitedCountries={visitedCountries} />
+            <StatisticsComponent 
+                visitedCountries={visitedCountries} 
+            />
         </View>
     );
 }
