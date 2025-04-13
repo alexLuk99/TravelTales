@@ -65,9 +65,14 @@ export default function Map() {
     };
 
     const handleCountryClick = (countryCode: string, countryName: string) => {
-        setSelectedCountry({ code: countryCode, name_en: countryName });
-        setIsModalVisible(true);
-    };
+        if (selectedCountry && selectedCountry.code === countryCode) {
+            setIsModalVisible(false);
+            setSelectedCountry(null);
+          } else {
+            setSelectedCountry({ code: countryCode, name_en: countryName });
+            setIsModalVisible(true);
+          }
+        };
 
     let text = 'Waiting...';
     if (errorMsg) {
@@ -85,6 +90,7 @@ export default function Map() {
                 filterWorldView={filterWorldView}
                 country={selectedCountry}
                 isModalVisible={isModalVisible}
+                hideCloseButton={true}
             />
             <CountryModal
                 isVisible={isModalVisible}
