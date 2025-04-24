@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet, TouchableWithoutFeedback, TouchableOpacity  } from 'react-native';
 import Modal from 'react-native-modal';
-import { opacity } from 'react-native-reanimated/lib/typescript/Colors';
 
 const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCountries, hideCloseButton }: any) => 
     { if (!country) return null;

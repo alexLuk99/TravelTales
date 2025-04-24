@@ -26,7 +26,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       compassEnabled={true}
       compassFadeWhenNorth={true}
       preferredFramesPerSecond={60}
-      compassPosition={{ top: 20, right: 20 }} // Position des Kompasses
+      compassPosition={{ top: 20, right: 20 }}
       
     >
       <VectorSource
