@@ -23,6 +23,8 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc"
       projection="globe"
       scaleBarEnabled={false}
+      //compassEnabled={true}
+      
     >
       <VectorSource
         id="global-layer-source"
