@@ -2,7 +2,15 @@ import React from 'react';
 import { View, Text, Button, StyleSheet, TouchableWithoutFeedback, TouchableOpacity  } from 'react-native';
 import Modal from 'react-native-modal';
 
-const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCountries, hideCloseButton }: any) => 
+const CountryModal = ({ 
+  isVisible, 
+  country, 
+  toggleVisited, 
+  dismiss, 
+  onHideComplete,
+  visitedCountries, 
+  hideCloseButton 
+}: any) => 
     { if (!country) return null;
         const visited = visitedCountries.includes(country.code);
 
@@ -16,11 +24,11 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
         <Modal
             isVisible={isVisible}
             animationIn="slideInDown"
-            animationOut="slideOutDown"
+            animationOut="slideOutUp"
             hasBackdrop={false}
             coverScreen={false}
-            animationInTiming={300}       // Öffnungsanimation in 300ms
-            animationOutTiming={300}      // Schließanimation in 300ms
+            animationInTiming={100}       // Öffnungsanimation in 300ms
+            animationOutTiming={400}      // Schließanimation in 300ms
             backdropTransitionOutTiming={300}  // Backdrop-Übergang in 300ms
             onBackButtonPress={dismiss}
             onBackdropPress={dismiss}
@@ -28,6 +36,7 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
             swipeDirection="up"
             swipeThreshold={60}
             useNativeDriver={true}
+            onModalHide={onHideComplete}
             style={styles.modalWrapper}
         >
         <View style={styles.modal}>

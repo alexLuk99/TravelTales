@@ -49,9 +49,13 @@ export default function Map() {
     }, []);
 
     const dismissModal = () => {
-        setSelectedCountry(null);
+        // setSelectedCountry(null);
         setIsModalVisible(false);
     };
+
+    const handleModalHide = () => {
+        setSelectedCountry(null);
+      };
 
     const toggleVisitedCountry = async (countryCode: string) => {
         let updatedCountries;
@@ -94,6 +98,7 @@ export default function Map() {
             />
             <CountryModal
                 isVisible={isModalVisible}
+                onHideComplete={handleModalHide}
                 country={selectedCountry}
                 toggleVisited={toggleVisitedCountry}
                 dismiss={dismissModal}

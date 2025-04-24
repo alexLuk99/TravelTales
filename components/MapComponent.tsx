@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import Mapbox, { Camera, FillLayer, LineLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
-const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country }: any) => {
+const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible }: any) => {
 
   const highlightLayerStyle = {
     fillColor: '#fbb03b',
@@ -27,7 +27,6 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       compassFadeWhenNorth={true}
       preferredFramesPerSecond={60}
       compassPosition={{ top: 20, right: 20 }}
-      
     >
       <VectorSource
         id="global-layer-source"
@@ -49,26 +48,26 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
           filter={filterWorldView}
           belowLayerID="water"
         />
-        <FillLayer
-          id="highlight-layer"
-          sourceID="country-boundaries"
-          sourceLayerID="country_boundaries"
-          style={highlightLayerStyle}
-          filter={highlightFilter}
-          belowLayerID="water"
-        />
-        <LineLayer
-          id="highlight-border-layer"
-          sourceID="country-boundaries"
-          sourceLayerID="country_boundaries"
-          style={{
-            lineColor: 'black',
-            lineWidth: 1,
-            lineOpacity: 1
-          }}
-          filter={highlightFilter}
-          aboveLayerID="water"
-        />
+          <FillLayer
+            id="highlight-layer"
+            sourceID="global-layer-source"
+            sourceLayerID="country_boundaries"
+            style={highlightLayerStyle}
+            filter={highlightFilter}
+            belowLayerID="water"
+          />
+          <LineLayer
+            id="highlight-border-layer"
+            sourceID="global-layer-source"
+            sourceLayerID="country_boundaries"
+            style={{
+              lineColor: 'black',
+              lineWidth: 1,
+              lineOpacity: 1
+            }}
+            filter={highlightFilter}
+            aboveLayerID="water"
+          />
       </VectorSource>
       <Camera followZoomLevel={0.9} followUserLocation />
       <LocationPuck pulsing={{ isEnabled: true }} />
