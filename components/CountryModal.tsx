@@ -14,7 +14,6 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
         }
 
     return (
-      console.log(country.iso_3166_1),
         <Modal
             isVisible={isVisible}
             animationIn="slideInDown"
@@ -32,29 +31,33 @@ const CountryModal = ({ isVisible, country, toggleVisited, dismiss, visitedCount
             useNativeDriver={true}
             style={styles.modalWrapper}
         >
-            <View style={styles.modal}>
-        {/* Flag-Emoji anzeigen */}
-        <Text style={styles.flagEmoji}>
-          {countryCodeToEmoji(country.iso_3166_1)}
-        </Text>
-        <Text style={styles.modalTitle}>{country.name_en}</Text>
-        <View style={styles.checkboxContainer}>
-          <Text style={styles.checkboxLabel}>Visited:</Text>
-          <TouchableOpacity
-            style={styles.checkbox}
-            onPress={() => {
-              toggleVisited(country.code);
-              dismiss();
-            }}
-          >
-            <Text style={styles.checkboxText}>{visited ? '✓' : ''}</Text>
-          </TouchableOpacity>
+        <View style={styles.modal}>
+        {/* Emoji und Ländername nebeneinander */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.modalTitleInline}>
+            {country.name_en}
+          </Text>
+          <Text style={styles.flagEmojiInline}>
+            {countryCodeToEmoji(country.iso_3166_1)}
+          </Text>
         </View>
-        {!hideCloseButton && (
-          <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
-            <Text style={styles.topCloseButtonText}>×</Text>
-          </TouchableOpacity>
-        )}
+          <View style={styles.checkboxContainer}>
+            <Text style={styles.checkboxLabel}>Visited:</Text>
+            <TouchableOpacity
+              style={styles.checkbox}
+              onPress={() => {
+                toggleVisited(country.code);
+                dismiss();
+              }}
+            >
+              <Text style={styles.checkboxText}>{visited ? '✓' : ''}</Text>
+            </TouchableOpacity>
+          </View>
+          {!hideCloseButton && (
+            <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
+              <Text style={styles.topCloseButtonText}>×</Text>
+            </TouchableOpacity>
+          )}
       </View>
     </Modal>
     );
@@ -68,7 +71,7 @@ const styles = StyleSheet.create({
     pointerEvents: 'auto',
   },
   flagEmoji: {
-    fontSize: 48,        // Größe des Emoji
+    fontSize: 40,        // Größe des Emoji
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -78,7 +81,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   checkboxLabel: {
-    fontSize: 16,
+    fontSize: 18,
     marginRight: 10,
   },
   checkbox: {
@@ -106,6 +109,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  flagEmojiInline: {
+    fontSize: 32,
+    marginLeft: 8,
+  },
   buttonContainer: {
     flexDirection: 'row',           // Ordnet die Buttons nebeneinander an
     justifyContent: 'space-between',// Gleichmäßiger Abstand
@@ -132,7 +144,7 @@ const styles = StyleSheet.create({
   },
   closeButtonText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 18,
     textAlign: 'center',
   },
   topCloseButton: {
@@ -145,6 +157,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbb03b',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalTitleInline: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#000',
   },
   topCloseButtonText: {
     color: 'white',
