@@ -49,7 +49,7 @@ export default function Map() {
     }, []);
 
     const dismissModal = () => {
-        // setSelectedCountry(null);
+        //setSelectedCountry(null);
         setIsModalVisible(false);
     };
 

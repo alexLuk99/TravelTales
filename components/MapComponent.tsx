@@ -5,7 +5,13 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
 
   const highlightLayerStyle = {
     fillColor: '#fbb03b',
-    fillOpacity: 1,
+    fillOpacity: isModalVisible ? 1 : 0,
+  };
+
+  const borderLayerStyle = {
+    lineColor: 'black',
+    lineWidth: 1,
+    lineOpacity: isModalVisible ? 1 : 0,
   };
 
   const highlightFilter = [
@@ -60,11 +66,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
             id="highlight-border-layer"
             sourceID="global-layer-source"
             sourceLayerID="country_boundaries"
-            style={{
-              lineColor: 'black',
-              lineWidth: 1,
-              lineOpacity: 1
-            }}
+            style={borderLayerStyle}
             filter={highlightFilter}
             aboveLayerID="water"
           />
