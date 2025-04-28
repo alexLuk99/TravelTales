@@ -3,57 +3,73 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const TOTAL_COUNTRIES = 195;
 
+type StatsProps = {
+  visitedCountries: string[];
+  wantToVisitCountries: string[];
+};
 
-const StatisticsComponent = ({ visitedCountries }: { visitedCountries: string[] }) => {
+
+const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsProps) => {
 
   const visitedCount = visitedCountries.length;
   const percentVisited = ((visitedCount / TOTAL_COUNTRIES) * 100).toFixed(0); // mit einer Nachkommastelle
   return (
     <View style={styles.container}>
-    <Text style={styles.label}>Countries Visited:</Text>
-    <Text style={styles.visitedText}>
-      <Text style={styles.visitedNumber}>{visitedCountries.length}</Text>
-      <Text style={styles.totalText}> / {TOTAL_COUNTRIES}</Text>
-      <Text style={styles.percentText}> ({percentVisited}%)</Text>
-    </Text>
-  </View>
+      <View style={styles.statsRow}>
+      <Text style={styles.label}>Total Countries Visited:</Text>
+        {/* Visited / Total */}
+        <Text style={styles.visitedNumber}>{visitedCount}</Text>
+        <Text style={styles.totalText}>/ {TOTAL_COUNTRIES}</Text>
+
+        {/* Prozent */}
+        <Text style={styles.percentText}>({percentVisited}%)</Text>
+
+        {/* Wishlist */}
+        <Text style={styles.wishlistText}>Wishlist: {wantToVisitCountries.length}</Text>
+      </View>
+    </View>
 );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,         // Reduziertes vertikales Padding
-    paddingHorizontal: 16,       // Reduziertes horizontales Padding
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Einheitlicher Hintergrund wie im Modal (leicht weiß, halbtransparent)
-    borderRadius: 8,            // Leicht abgerundete Ecken (ähnlich wie im Modal)
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    borderRadius: 8,
+    alignItems: 'center'
   },
   label: {
-    fontSize: 16,
-    color: 'rgba(0, 0, 0, 0.8)', // Für ein gehaltvolleres Theme, z.B. dunkler Text statt hell, je nach Gesamt-Theme
-    marginRight: 10,            // Etwas mehr Abstand, damit der Text nicht zu nah an der Zahl ist
+    fontSize: 18,
     fontWeight: 'bold',
+    color: 'rgba(0,0,0,0.8)',
+    marginBottom: 4,
+    marginRight: 8
   },
-  visitedText: {
+  statsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   visitedNumber: {
-    fontSize: 26,               // Etwas kleinere Schrift, damit das Component kompakter wird
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#3bb2d0',           // Farbe passend zur Karte (z.B. Wasserblau)
+    color: '#3bb2d0'
   },
   totalText: {
     fontSize: 18,
-    color: 'rgba(0, 0, 0, 0.6)', // Leicht abgeschwächter Text, der nicht vom Wesentlichen ablenkt
+    color: 'rgba(0,0,0,0.6)',
+    marginHorizontal: 2
   },
   percentText: {
-    fontSize: 14,
-    fontWeight: 'light',
-    color: 'rgba(0, 0, 0, 0.6)',
-    marginLeft: 4,
+    fontSize: 12,
+    color: 'rgba(0,0,0,0.6)',
+    marginRight: 16,
+    marginTop: 6
   },
+  wishlistText: {
+    fontSize: 14,
+    color: 'rgba(51,51,51,0.7)'
+  }
 });
 
 export default StatisticsComponent;

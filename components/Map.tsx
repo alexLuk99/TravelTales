@@ -133,6 +133,7 @@ export default function Map() {
             />
             <StatisticsComponent
                 visitedCountries={visitedCountries}
+                wantToVisitCountries={wantToVisitCountries}
             />
         </View>
     );

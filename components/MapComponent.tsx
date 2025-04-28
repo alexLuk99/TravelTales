@@ -49,6 +49,8 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       scaleBarEnabled={false}
       compassEnabled={true}
       compassFadeWhenNorth={true}
+      compassViewPosition={1}
+      compassViewMargins={{ x: 20, y: 120 }}
       preferredFramesPerSecond={60}
       compassPosition={{ top: 20, right: 20 }}
     >

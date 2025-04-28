@@ -68,7 +68,7 @@ const CountryModal = ({
               </TouchableOpacity>
             </View>
             <View style={styles.checkboxContainer}>
-              <Text style={styles.checkboxLabel}>Want to Visit</Text>
+              <Text style={styles.checkboxLabel}>Wishlist</Text>
               <TouchableOpacity
                 style={styles.checkbox}
                 onPress={() => {
