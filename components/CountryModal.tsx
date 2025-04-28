@@ -5,14 +5,17 @@ import Modal from 'react-native-modal';
 const CountryModal = ({ 
   isVisible, 
   country, 
-  toggleVisited, 
+  toggleVisited,
+  toggleWantToVisit, 
   dismiss, 
   onHideComplete,
   visitedCountries, 
+  wantToVisitCountries,
   hideCloseButton 
 }: any) => 
     { if (!country) return null;
         const visited = visitedCountries.includes(country.code);
+        const want = wantToVisitCountries.includes(country.code);
 
         function countryCodeToEmoji(countryCode: string) {
           return countryCode.toUpperCase().replace(/./g, char =>
@@ -27,9 +30,9 @@ const CountryModal = ({
             animationOut="slideOutUp"
             hasBackdrop={false}
             coverScreen={false}
-            animationInTiming={100}       // Öffnungsanimation in 300ms
-            animationOutTiming={400}      // Schließanimation in 300ms
-            backdropTransitionOutTiming={300}  // Backdrop-Übergang in 300ms
+            animationInTiming={150}
+            animationOutTiming={600}
+            backdropTransitionOutTiming={600}
             onBackButtonPress={dismiss}
             onBackdropPress={dismiss}
             onSwipeComplete={dismiss}
@@ -40,26 +43,44 @@ const CountryModal = ({
             style={styles.modalWrapper}
         >
         <View style={styles.modal}>
-        {/* Emoji und Ländername nebeneinander */}
-        <View style={styles.titleContainer}>
-          <Text style={styles.modalTitleInline}>
-            {country.name_en}
-          </Text>
-          <Text style={styles.flagEmojiInline}>
-            {countryCodeToEmoji(country.iso_3166_1)}
-          </Text>
-        </View>
-          <View style={styles.checkboxContainer}>
-            <Text style={styles.checkboxLabel}>Visited:</Text>
-            <TouchableOpacity
-              style={styles.checkbox}
-              onPress={() => {
-                toggleVisited(country.code);
-                dismiss();
-              }}
-            >
-              <Text style={styles.checkboxText}>{visited ? '✓' : ''}</Text>
-            </TouchableOpacity>
+          <View style={styles.titleContainer}>
+            <Text style={styles.modalTitleInline}>
+              {country.name_en}
+            </Text>
+            <Text style={styles.flagEmojiInline}>
+              {countryCodeToEmoji(country.iso_3166_1)}
+            </Text>
+          </View>
+
+          <View style={styles.checkboxRow}>
+            <View style={styles.checkboxContainer}>
+              <Text style={styles.checkboxLabel}>Visited</Text>
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => {
+                  toggleVisited(country.code);
+                  dismiss();
+                }}
+              >
+                <Text style={styles.checkboxText}>
+                  {visited ? '✓' : ''}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.checkboxContainer}>
+              <Text style={styles.checkboxLabel}>Want to Visit</Text>
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={() => {
+                  toggleWantToVisit(country.code);
+                  dismiss();
+                }}
+              >
+                <Text style={styles.checkboxText}>
+                  {want ? '★' : ''}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
           {!hideCloseButton && (
             <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
@@ -75,7 +96,7 @@ const styles = StyleSheet.create({
   modalWrapper: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    margin: 0,
+    margin: 10,
     pointerEvents: 'auto',
   },
   flagEmoji: {
@@ -86,7 +107,13 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row', 
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginVertical: 1
   },
   checkboxLabel: {
     fontSize: 18,
@@ -100,9 +127,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  checkboxDisabled: {
+    opacity: 0.3,                // ausgegraut
+    borderColor: '#999',
+    },
   checkboxText: {
     fontSize: 18,
-    color: '#3bb2d0',           // z. B. Wasser-Blau wie in deinem fillLayerStyle
+    color: '#f4a261'
   },
   modal: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -132,7 +163,7 @@ const styles = StyleSheet.create({
     width: '100%',                  // Container nimmt die gesamte Breite des Modals ein
   },
   primaryButton: {
-    backgroundColor: '#3bb2d0', // z. B. der Wasser-Farbton
+    backgroundColor: '#3bb2d0',
     borderRadius: 5,
     paddingVertical: 10,
     paddingHorizontal: 20,

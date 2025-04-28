@@ -12,6 +12,7 @@ Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 export default function Map() {
     const { location, errorMsg } = useUserLocation();
     const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
+    const [wantToVisitCountries, setWantToVisitCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -35,48 +36,71 @@ export default function Map() {
     ];
 
     useEffect(() => {
-        const loadVisitedCountries = async () => {
+        (async () => {
             try {
-                const storedCountries = await AsyncStorage.getItem('visitedCountries');
-                if (storedCountries) {
-                    setVisitedCountries(JSON.parse(storedCountries));
-                }
-            } catch (error) {
-                console.error('Fehler beim Laden der gespeicherten Länder:', error);
+                const v = await AsyncStorage.getItem('visitedCountries');
+                const w = await AsyncStorage.getItem('wantToVisitCountries');
+                if (v) setVisitedCountries(JSON.parse(v));
+                if (w) setWantToVisitCountries(JSON.parse(w));
+            } catch (e) {
+                console.error(e);
             }
-        };
-        loadVisitedCountries();
+        })();
     }, []);
 
-    const dismissModal = () => {
-        //setSelectedCountry(null);
-        setIsModalVisible(false);
-    };
-
-    const handleModalHide = () => {
-        setSelectedCountry(null);
-      };
+    const dismissModal = () => setIsModalVisible(false);
+    const handleModalHide = () => setSelectedCountry(null);
 
     const toggleVisitedCountry = async (countryCode: string) => {
-        let updatedCountries;
-        if (visitedCountries.includes(countryCode)) {
-            updatedCountries = visitedCountries.filter(code => code !== countryCode);
-        } else {
-            updatedCountries = [...visitedCountries, countryCode];
-        }
-        setVisitedCountries(updatedCountries);
-        await AsyncStorage.setItem('visitedCountries', JSON.stringify(updatedCountries));
+      let updatedVisited: string[];
+      if (visitedCountries.includes(countryCode)) {
+        // war besucht → entferne es
+        updatedVisited = visitedCountries.filter(c => c !== countryCode);
+      } else {
+        // war nicht besucht → füge es hinzu
+        updatedVisited = [...visitedCountries, countryCode];
+      }
+    
+      // Immer sicherstellen, dass es nicht gleichzeitig in wantToVisit ist
+      const updatedWant = wantToVisitCountries.filter(c => c !== countryCode);
+    
+      setVisitedCountries(updatedVisited);
+      await AsyncStorage.setItem('visitedCountries', JSON.stringify(updatedVisited));
+    
+      setWantToVisitCountries(updatedWant);
+      await AsyncStorage.setItem('wantToVisitCountries', JSON.stringify(updatedWant));
+    };
+    
+    // 2) toggleWantToVisitCountry in Map.tsx
+    const toggleWantToVisitCountry = async (countryCode: string) => {
+      let updatedWant: string[];
+      if (wantToVisitCountries.includes(countryCode)) {
+        // war auf der Wunschliste → entferne es
+        updatedWant = wantToVisitCountries.filter(c => c !== countryCode);
+      } else {
+        // war nicht auf der Wunschliste → füge es hinzu
+        updatedWant = [...wantToVisitCountries, countryCode];
+      }
+    
+      // Immer sicherstellen, dass es nicht gleichzeitig als besucht markiert ist
+      const updatedVisited = visitedCountries.filter(c => c !== countryCode);
+    
+      setWantToVisitCountries(updatedWant);
+      await AsyncStorage.setItem('wantToVisitCountries', JSON.stringify(updatedWant));
+    
+      setVisitedCountries(updatedVisited);
+      await AsyncStorage.setItem('visitedCountries', JSON.stringify(updatedVisited));
     };
 
     const handleCountryClick = (countryCode: string, countryName: string, countryCodeAlpha2: string) => {
         if (selectedCountry && selectedCountry.code === countryCode) {
             setIsModalVisible(false);
             setSelectedCountry(null);
-          } else {
+        } else {
             setSelectedCountry({ code: countryCode, name_en: countryName, iso_3166_1: countryCodeAlpha2 });
             setIsModalVisible(true);
-          }
-        };
+        }
+    };
 
     let text = 'Waiting...';
     if (errorMsg) {
@@ -89,6 +113,7 @@ export default function Map() {
         <View style={{ flex: 1 }}>
             <MapComponent
                 visitedCountries={visitedCountries}
+                wantToVisitCountries={wantToVisitCountries}
                 handleCountryClick={handleCountryClick}
                 fillLayerStyle={fillLayerStyle}
                 filterWorldView={filterWorldView}
@@ -101,11 +126,13 @@ export default function Map() {
                 onHideComplete={handleModalHide}
                 country={selectedCountry}
                 toggleVisited={toggleVisitedCountry}
+                toggleWantToVisit={toggleWantToVisitCountry}
                 dismiss={dismissModal}
                 visitedCountries={visitedCountries}
+                wantToVisitCountries={wantToVisitCountries}
             />
-            <StatisticsComponent 
-                visitedCountries={visitedCountries} 
+            <StatisticsComponent
+                visitedCountries={visitedCountries}
             />
         </View>
     );
