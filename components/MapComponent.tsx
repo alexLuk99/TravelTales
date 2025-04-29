@@ -47,12 +47,10 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc"
       projection="globe"
       scaleBarEnabled={false}
-      compassEnabled={true}
-      compassFadeWhenNorth={true}
-      compassViewPosition={1}
-      compassViewMargins={{ x: 20, y: 120 }}
       preferredFramesPerSecond={60}
-      compassPosition={{ top: 20, right: 20 }}
+      compassEnabled={true}
+      compassFadeWhenNorth={false} 
+      compassPosition={{  top: 200, right: 5 }}
     >
       <VectorSource
         id="global-layer-source"

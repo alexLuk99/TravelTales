@@ -16,7 +16,7 @@ const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsPr
   return (
     <View style={styles.container}>
       <View style={styles.statsRow}>
-      <Text style={styles.label}>Total Countries Visited:</Text>
+      <Text style={styles.label}>Visited:</Text>
         {/* Visited / Total */}
         <Text style={styles.visitedNumber}>{visitedCount}</Text>
         <Text style={styles.totalText}>/ {TOTAL_COUNTRIES}</Text>
@@ -25,7 +25,7 @@ const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsPr
         <Text style={styles.percentText}>({percentVisited}%)</Text>
 
         {/* Wishlist */}
-        <Text style={styles.wishlistText}>Wishlist: {wantToVisitCountries.length}</Text>
+        <Text style={[styles.wishlistText,]}>Wishlist: {wantToVisitCountries.length}</Text>
       </View>
     </View>
 );
