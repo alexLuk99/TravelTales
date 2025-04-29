@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const TOTAL_COUNTRIES = 195;
 
@@ -16,17 +16,18 @@ const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsPr
   return (
     <View style={styles.container}>
       <View style={styles.statsRow}>
-      <Text style={styles.label}>Visited:</Text>
-        {/* Visited / Total */}
-        <Text style={styles.visitedNumber}>{visitedCount}</Text>
-        <Text style={styles.totalText}>/ {TOTAL_COUNTRIES}</Text>
-
-        {/* Prozent */}
-        <Text style={styles.percentText}>({percentVisited}%)</Text>
-
-        {/* Wishlist */}
-        <Text style={[styles.wishlistText,]}>Wishlist: {wantToVisitCountries.length}</Text>
+        <Text style={styles.label}>Visited:</Text>
+          {/* Visited / Total */}
+          <Text style={styles.visitedNumber}>{visitedCount}</Text>
+          <Text style={styles.totalText}>/ {TOTAL_COUNTRIES}</Text>
+          {/* Prozent */}
+          <Text style={styles.percentText}>({percentVisited}%)</Text>
+          {/* Wishlist */}
+          <Text style={[styles.wishlistText,]}>Wishlist: {wantToVisitCountries.length}</Text>
       </View>
+      <TouchableOpacity style={styles.burgerButton} onPress={() => {/* dein Handler */}}>
+            <Text style={styles.burgerIcon}>☰</Text>
+      </TouchableOpacity>
     </View>
 );
 };
@@ -37,7 +38,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: 'rgba(255,255,255,0.8)',
     borderRadius: 8,
-    alignItems: 'center'
+    alignItems: 'flex-end',
+    position: 'relative',
+    justifyContent: 'space-between',
+    width: '100%',
+    flexDirection: 'row',
   },
   label: {
     fontSize: 18,
@@ -48,7 +53,7 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
   },
   visitedNumber: {
     fontSize: 24,
@@ -69,7 +74,15 @@ const styles = StyleSheet.create({
   wishlistText: {
     fontSize: 14,
     color: 'rgba(51,51,51,0.7)'
-  }
+  },
+  burgerButton: {
+    position: 'relative',
+  },
+   burgerIcon: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'rgba(0,0,0,0.7)',
+   },
 });
 
 export default StatisticsComponent;
