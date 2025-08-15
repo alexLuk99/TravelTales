@@ -1,45 +1,39 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import Mapbox, { Camera, FillLayer, LineLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
 const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries }: any) => {
 
-  const highlightLayerStyle = {
+  const highlightLayerStyle = useMemo(() => ({
     fillColor: '#fbb03b',
     fillOpacity: isModalVisible ? 1 : 0,
-  };
+  }), [isModalVisible]);
 
-  const borderLayerStyle = {
+  const borderLayerStyle = useMemo(() => ({
     lineColor: 'black',
     lineWidth: 1,
     lineOpacity: isModalVisible ? 1 : 0,
-  };
+  }), [isModalVisible]);
 
-  const wantLayerStyle = {
+  const wantLayerStyle = useMemo(() => ({
     fillColor: '#f4a261',
     fillOpacity: 1,
-  };
+   }), []);
 
-  const wantFilter = [
-    "all",
-    ["any",
-      ["==", "all", ["get", "worldview"]],
-      ["in", "US", ["get", "worldview"]]
-    ],
-    ["==", ["get", "disputed"], "false"],
-    ["in",
-      ["get", "iso_3166_1_alpha_3"],
-      ["literal", wantToVisitCountries.length ? wantToVisitCountries : ["NONE"]]
-    ]
-  ];
+  const wantFilter = useMemo(() => ([
+    'all',
+    ['any', ['==','all',['get','worldview']], ['in','US',['get','worldview']]],
+    ['==', ['get','disputed'], 'false'],
+    ['in', ['get','iso_3166_1_alpha_3'], ['literal', wantToVisitCountries.length ? wantToVisitCountries : ['NONE']]],
+  ]), [wantToVisitCountries]);
 
-  const highlightFilter = [
-    "all",
-    ["any", ["==", "all", ["get", "worldview"]], ["in", "US", ["get", "worldview"]]],
-    ["==", ["get", "disputed"], "false"],
+  const highlightFilter = useMemo(() => ([
+    'all',
+    ['any', ['==','all',['get','worldview']], ['in','US',['get','worldview']]],
+    ['==', ['get','disputed'], 'false'],
     country?.code
-      ? ['==', ['get', 'iso_3166_1_alpha_3'], country.code]
-      : ['==', ['get', 'iso_3166_1_alpha_3'], '']
-  ];
+    ? ['==', ['get','iso_3166_1_alpha_3'], country.code]
+    : ['==', ['get','iso_3166_1_alpha_3'], ''],
+  ]), [country]);
 
   return (
     <MapView
@@ -49,7 +43,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       scaleBarEnabled={false}
       preferredFramesPerSecond={60}
       compassEnabled={true}
-      compassFadeWhenNorth={false} 
+      compassFadeWhenNorth={true} 
       compassPosition={{  top: 200, right: 5 }}
     >
       <VectorSource
@@ -66,26 +60,24 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       >
         <FillLayer
           id="country-layer"
-          sourceID="country-boundaries"
+          sourceID="global-layer-source"
           sourceLayerID="country_boundaries"
           style={fillLayerStyle}
           filter={filterWorldView}
-          belowLayerID="water"
+          // belowLayerID="water"
         />
         <FillLayer
           id="want-layer"
           sourceID="global-layer-source"
           sourceLayerID="country_boundaries"
-          existing
-          style={wantLayerStyle}
+          style={wantLayerStyle} 
           filter={wantFilter}
-          belowLayerID="water"
+          // belowLayerID="water"
         />
         <FillLayer
           id="highlight-layer"
           sourceID="global-layer-source"
           sourceLayerID="country_boundaries"
-          existing
           style={highlightLayerStyle}
           filter={highlightFilter}
           belowLayerID="water"
@@ -94,7 +86,6 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
           id="highlight-border-layer"
           sourceID="global-layer-source"
           sourceLayerID="country_boundaries"
-          existing
           style={borderLayerStyle}
           filter={highlightFilter}
           aboveLayerID="water"

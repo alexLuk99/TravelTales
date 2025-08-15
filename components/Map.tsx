@@ -1,6 +1,6 @@
 import Mapbox from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
@@ -16,7 +16,7 @@ export default function Map() {
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
-    const fillLayerStyle = {
+    const fillLayerStyle = useMemo(() => ({
         fillColor: '#3bb2d0',
         fillOpacity: [
             'case',
@@ -24,16 +24,16 @@ export default function Map() {
             0,
             0.7
         ],
-    };
+    }), [visitedCountries]);
 
-    const filterWorldView = [
+    const filterWorldView = useMemo(() => ([
         "all",
         ["any",
             ["==", "all", ["get", "worldview"]],
             ["in", "US", ["get", "worldview"]]
         ],
         ["==", ["get", "disputed"], "false"]
-    ];
+    ]), []);
 
     useEffect(() => {
         (async () => {
@@ -51,45 +51,34 @@ export default function Map() {
     const dismissModal = () => setIsModalVisible(false);
     const handleModalHide = () => setSelectedCountry(null);
 
-    const toggleVisitedCountry = async (countryCode: string) => {
-      let updatedVisited: string[];
-      if (visitedCountries.includes(countryCode)) {
-        // war besucht → entferne es
-        updatedVisited = visitedCountries.filter(c => c !== countryCode);
-      } else {
-        // war nicht besucht → füge es hinzu
-        updatedVisited = [...visitedCountries, countryCode];
-      }
-    
-      // Immer sicherstellen, dass es nicht gleichzeitig in wantToVisit ist
-      const updatedWant = wantToVisitCountries.filter(c => c !== countryCode);
-    
-      setVisitedCountries(updatedVisited);
-      await AsyncStorage.setItem('visitedCountries', JSON.stringify(updatedVisited));
-    
-      setWantToVisitCountries(updatedWant);
-      await AsyncStorage.setItem('wantToVisitCountries', JSON.stringify(updatedWant));
+    const toggleVisitedCountry = async (code: string) => {
+        const v = new Set(visitedCountries);
+        const w = new Set(wantToVisitCountries);
+        v.has(code) ? v.delete(code) : v.add(code);
+        w.delete(code);
+        const visitedArr = [...v];
+        const wantArr = [...w];
+        setVisitedCountries(visitedArr);
+        setWantToVisitCountries(wantArr);
+        await AsyncStorage.multiSet([
+            ['visitedCountries', JSON.stringify(visitedArr)],
+            ['wantToVisitCountries', JSON.stringify(wantArr)],
+        ]);
     };
     
-    // 2) toggleWantToVisitCountry in Map.tsx
-    const toggleWantToVisitCountry = async (countryCode: string) => {
-      let updatedWant: string[];
-      if (wantToVisitCountries.includes(countryCode)) {
-        // war auf der Wunschliste → entferne es
-        updatedWant = wantToVisitCountries.filter(c => c !== countryCode);
-      } else {
-        // war nicht auf der Wunschliste → füge es hinzu
-        updatedWant = [...wantToVisitCountries, countryCode];
-      }
-    
-      // Immer sicherstellen, dass es nicht gleichzeitig als besucht markiert ist
-      const updatedVisited = visitedCountries.filter(c => c !== countryCode);
-    
-      setWantToVisitCountries(updatedWant);
-      await AsyncStorage.setItem('wantToVisitCountries', JSON.stringify(updatedWant));
-    
-      setVisitedCountries(updatedVisited);
-      await AsyncStorage.setItem('visitedCountries', JSON.stringify(updatedVisited));
+    const toggleWantToVisitCountry = async (code: string) => {
+        const v = new Set(visitedCountries);
+        const w = new Set(wantToVisitCountries);
+        w.has(code) ? w.delete(code) : w.add(code);
+        v.delete(code);
+        const visitedArr = [...v];
+        const wantArr = [...w];
+        setVisitedCountries(visitedArr);
+        setWantToVisitCountries(wantArr);
+        await AsyncStorage.multiSet([
+          ['visitedCountries', JSON.stringify(visitedArr)],
+          ['wantToVisitCountries', JSON.stringify(wantArr)],
+        ]);
     };
 
     const handleCountryClick = (countryCode: string, countryName: string, countryCodeAlpha2: string) => {

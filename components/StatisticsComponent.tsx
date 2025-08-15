@@ -12,7 +12,7 @@ type StatsProps = {
 const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsProps) => {
 
   const visitedCount = visitedCountries.length;
-  const percentVisited = ((visitedCount / TOTAL_COUNTRIES) * 100).toFixed(0); // mit einer Nachkommastelle
+  const percentVisited = ((visitedCount / TOTAL_COUNTRIES) * 100).toFixed(0);
   return (
     <View style={styles.container}>
       <View style={styles.statsRow}>
@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 8,
     alignItems: 'flex-end',
     position: 'relative',
     justifyContent: 'space-between',
