@@ -2,21 +2,24 @@ import React, { useMemo, useRef } from 'react';
 import Mapbox, { Camera, FillLayer, LineLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
 const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries }: any) => {
-
+  
   const highlightLayerStyle = useMemo(() => ({
     fillColor: '#fbb03b',
-    fillOpacity: isModalVisible ? 1 : 0,
+    fillOpacity: isModalVisible ? 0.18 : 0,           // dezenter
+    fillOpacityTransition: { duration: 160 },         // smoother
   }), [isModalVisible]);
 
   const borderLayerStyle = useMemo(() => ({
-    lineColor: 'black',
-    lineWidth: 1,
+    lineColor: '#1f2937',
     lineOpacity: isModalVisible ? 1 : 0,
+    lineJoin: 'round',
+    lineCap: 'round',
+    lineWidth: ['interpolate', ['linear'], ['zoom'], 1, 0.5, 6, 1.6, 8, 2.2],
   }), [isModalVisible]);
 
   const wantLayerStyle = useMemo(() => ({
     fillColor: '#f4a261',
-    fillOpacity: 1,
+    fillOpacity: 0.7,
    }), []);
 
   const wantFilter = useMemo(() => ([
@@ -43,7 +46,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       scaleBarEnabled={false}
       preferredFramesPerSecond={60}
       compassEnabled={true}
-      compassFadeWhenNorth={true} 
+      compassFadeWhenNorth={false} 
       compassPosition={{  top: 200, right: 5 }}
     >
       <VectorSource
@@ -59,36 +62,38 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
         }}
       >
         <FillLayer
-          id="country-layer"
-          sourceID="global-layer-source"
-          sourceLayerID="country_boundaries"
-          style={fillLayerStyle}
-          filter={filterWorldView}
-          // belowLayerID="water"
-        />
-        <FillLayer
-          id="want-layer"
-          sourceID="global-layer-source"
-          sourceLayerID="country_boundaries"
-          style={wantLayerStyle} 
-          filter={wantFilter}
-          // belowLayerID="water"
-        />
-        <FillLayer
           id="highlight-layer"
           sourceID="global-layer-source"
           sourceLayerID="country_boundaries"
           style={highlightLayerStyle}
           filter={highlightFilter}
-          belowLayerID="water"
+          belowLayerID='water'
         />
+        {/* 2) Overlay-Maske */}
+        <FillLayer
+          id="country-layer"
+          sourceID="global-layer-source"
+          sourceLayerID="country_boundaries"
+          style={fillLayerStyle}
+          filter={filterWorldView}
+          belowLayerID='water'
+        />
+        {/* 3) Wishlist oben */}
+        <FillLayer
+          id="want-layer"
+          sourceID="global-layer-source"
+          sourceLayerID="country_boundaries"
+          style={wantLayerStyle}
+          filter={wantFilter}
+          belowLayerID='water'
+        />
+        {/* 4) Kontur ganz oben */}
         <LineLayer
           id="highlight-border-layer"
           sourceID="global-layer-source"
           sourceLayerID="country_boundaries"
           style={borderLayerStyle}
           filter={highlightFilter}
-          aboveLayerID="water"
         />
       </VectorSource>
       <Camera followZoomLevel={0.9} followUserLocation />
