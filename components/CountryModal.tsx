@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   flagEmojiInline: {
-    fontSize: 32,
+    fontSize: 26,
     marginLeft: 8,
   },
   buttonContainer: {
