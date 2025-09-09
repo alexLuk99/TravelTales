@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
 import MapComponent from './MapComponent';
 import StatisticsComponent from './StatisticsComponent';
+import * as Haptics from 'expo-haptics';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
@@ -24,6 +25,7 @@ export default function Map() {
             0,
             0.7
         ],
+        fillOpacityTransition: { duration: 1000 },
     }), [visitedCountries]);
 
     const filterWorldView = useMemo(() => ([
@@ -52,6 +54,7 @@ export default function Map() {
     const handleModalHide = () => setSelectedCountry(null);
 
     const toggleVisitedCountry = async (code: string) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         const v = new Set(visitedCountries);
         const w = new Set(wantToVisitCountries);
         v.has(code) ? v.delete(code) : v.add(code);
@@ -67,6 +70,7 @@ export default function Map() {
     };
     
     const toggleWantToVisitCountry = async (code: string) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         const v = new Set(visitedCountries);
         const w = new Set(wantToVisitCountries);
         w.has(code) ? w.delete(code) : w.add(code);
