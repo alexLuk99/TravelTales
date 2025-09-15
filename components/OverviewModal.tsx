@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from 'react';
+import React, { memo, useMemo, useCallback, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, type ListRenderItem } from 'react-native';
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
@@ -40,6 +40,8 @@ function flattenSections(sections: Section[]): FlatRow[] {
   return out;
 }
 
+type FilterMode = 'all' | 'visited' | 'wishlist';
+
 function OverviewModalBase({
   visible,
   onClose,
@@ -52,13 +54,31 @@ function OverviewModalBase({
 }: Props) {
   const visitedSet = useMemo(() => new Set(visitedCountries), [visitedCountries]);
   const wishSet    = useMemo(() => new Set(wantToVisitCountries), [wantToVisitCountries]);
+  const [filterMode, setFilterMode] = useState<FilterMode>('all');
 
-  const data = useMemo(() => flattenSections(sections), [sections]);
+  const filteredSections = useMemo(() => {
+    if (filterMode === 'all') return sections;
+  
+    const keep = (c: Country) =>
+      filterMode === 'visited'
+        ? visitedSet.has(c.iso_3166_1_alpha_3)
+        : wishSet.has(c.iso_3166_1_alpha_3);
+  
+    const out: Section[] = [];
+    for (const sec of sections) {
+      const data = sec.data.filter(keep);
+      if (data.length) out.push({ ...sec, data });
+    }
+    return out;
+  }, [sections, filterMode, visitedSet, wishSet]);
+
+  const data = useMemo(() => flattenSections(filteredSections), [filteredSections]);
 
   const stickyHeaderIndices = useMemo(
     () => data.map((row, i) => (row.type === 'header' ? i : -1)).filter(i => i !== -1),
     [data]
   );
+
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FlatRow>) => {
@@ -113,18 +133,44 @@ function OverviewModalBase({
           <TouchableOpacity onPress={onClose}><Text style={s.close}>×</Text></TouchableOpacity>
         </View>
 
-        <View style={{ maxHeight: 420, height: 420 }}>
+        <View style={s.filters}>
+          <TouchableOpacity
+            style={[s.filterBtn, filterMode === 'all' && s.filterBtnOn]}
+            onPress={() => setFilterMode('all')}
+          >
+            <Text style={[s.filterText, filterMode === 'all' && s.filterTextOn]}>Alle</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.filterBtn, filterMode === 'visited' && s.filterBtnOn]}
+            onPress={() => setFilterMode('visited')}
+          >
+            <Text style={[s.filterText, filterMode === 'visited' && s.filterTextOn]}>
+              Visited ({visitedCountries.length})
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.filterBtn, filterMode === 'wishlist' && s.filterBtnOn]}
+            onPress={() => setFilterMode('wishlist')}
+          >
+            <Text style={[s.filterText, filterMode === 'wishlist' && s.filterTextOn]}>
+              Wishlist ({wantToVisitCountries.length})
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={{ height: 420 }}>
           <FlashList
             data={data}
             renderItem={renderItem}
             keyExtractor={(it: FlatRow) => it.key}
             getItemType={getItemType}
+            // estimatedItemSize={44} // falls deine Version das schon kann
+            stickyHeaderIndices={stickyHeaderIndices}
             drawDistance={800}
             showsVerticalScrollIndicator
-            stickyHeaderIndices={stickyHeaderIndices}
             contentContainerStyle={{ paddingBottom: 16 }}
             style={{ flex: 1 }}
-            ListEmptyComponent={<Text style={{ padding: 12 }}>No items found</Text>}
+            ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
           />
         </View>
       </View>
@@ -143,6 +189,25 @@ const s = StyleSheet.create({
     padding: 16,
     maxHeight: '85%',
   },
+  filters: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  filterBtn: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+  },
+  filterBtnOn: {
+    borderColor: '#3bb2d0',
+    backgroundColor: 'rgba(59,178,208,0.10)',
+  },
+  filterText: { fontSize: 13, color: '#333', fontWeight: '600' },
+  filterTextOn: { color: '#117a8b' },
   grabber: {
     alignSelf: 'center',
     width: 36,

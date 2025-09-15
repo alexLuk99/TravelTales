@@ -9,7 +9,7 @@ import StatisticsComponent from './StatisticsComponent';
 import * as Haptics from 'expo-haptics';
 import OverviewModal from './OverviewModal';
 import { COUNTRY_SECTIONS  } from '@/components/data/countries';
-import { useRef } from 'react';
+import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 
@@ -20,7 +20,6 @@ export default function Map() {
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isOverviewOpen, setIsOverviewOpen] = useState(false);
-    const countries = COUNTRY_SECTIONS ;
 
     const fillLayerStyle = useMemo(() => ({
         fillColor: '#3bb2d0',
@@ -103,23 +102,6 @@ export default function Map() {
         text = JSON.stringify(location);
     }
 
-    function useDebouncedPersist(visited: string[], wish: string[]) {
-        const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-      
-        useEffect(() => {
-          if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          timeoutRef.current = setTimeout(() => {
-            AsyncStorage.multiSet([
-              ['visitedCountries', JSON.stringify(visited)],
-              ['wantToVisitCountries', JSON.stringify(wish)],
-            ]).catch(() => {});
-          }, 250); // 250–400ms: fühlt sich instant an, spart IO/Bridge
-          return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-          };
-        }, [visited, wish]);
-      }
-      
     useDebouncedPersist(visitedCountries, wantToVisitCountries);
 
     return (

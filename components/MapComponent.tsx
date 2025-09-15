@@ -5,8 +5,8 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   
   const highlightLayerStyle = useMemo(() => ({
     fillColor: '#fbb03b',
-    fillOpacity: isModalVisible ? 0.18 : 0,           // dezenter
-    fillOpacityTransition: { duration: 160 },         // smoother
+    fillOpacity: isModalVisible ? 0.18 : 0,           
+    fillOpacityTransition: { duration: 160 },         
   }), [isModalVisible]);
 
   const borderLayerStyle = useMemo(() => ({
