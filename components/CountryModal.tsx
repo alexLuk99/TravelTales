@@ -93,22 +93,26 @@ function CountryModalBase({
         <TouchableOpacity
           style={[s.actionBtn, visited && s.actionOnVisited]}
           onPress={() => { toggleVisited(country.code); dismiss(); }}
-          accessibilityRole="button"
-          accessibilityLabel={visited ? 'Remove from Visited' : 'Mark as Visited'}
         >
-          <Text style={[s.actionIcon, s.visitedIcon]}>{visited ? '✓' : ' '}</Text>
+          <Text style={[s.actionIcon, s.visitedIcon]}>
+            {visited ? '✓' : '✓'}  {/* Symbol */}
+          </Text>
           <Text style={[s.actionText, s.visitedText]}>Visited</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[s.actionBtn, want && s.actionOnWish]}
-          onPress={() => { toggleWantToVisit(country.code); dismiss(); }}
-          accessibilityRole="button"
-          accessibilityLabel={want ? 'Remove from Wishlist' : 'Add to Wishlist'}
+          onPress={() => {
+            toggleWantToVisit(country.code);
+            dismiss();
+          }}
         >
-          <Text style={[s.actionIcon, s.wishIcon]}>{want ? '★' : ' '}</Text>
+          <Text style={[s.actionIcon, s.wishIcon]}>
+            {want ? '★' : '★'} {/* Symbol */}
+          </Text>
           <Text style={[s.actionText, s.wishText]}>Wishlist</Text>
         </TouchableOpacity>
+
       </View>
 
       {/* Grabber ganz unten im Modal */}
@@ -132,7 +136,7 @@ const s = StyleSheet.create({
     width: '96%',
     backgroundColor: 'white',
     borderRadius: 14,
-    padding: 16,
+    padding: 10,
     shadowColor: '#000',
     shadowOpacity: 0.12,
     shadowRadius: 8,
@@ -154,9 +158,9 @@ const s = StyleSheet.create({
     gap: 8,
     maxWidth: '88%',
   },
-  flag: { fontSize: 22, lineHeight: 22 },
+  flag: { fontSize: 30, lineHeight: 30 },
   title: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: '700',
     color: '#111',
     textAlign: 'center',
@@ -168,30 +172,30 @@ const s = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-    padding: 4,
+    padding: 6,
   },
-  close: { fontSize: 24, lineHeight: 24 },
+  close: { fontSize: 26, lineHeight: 26, color: '#555' },
 
   // Action-Buttons
   actions: {
     flexDirection: 'row',
+    justifyContent: 'center',
     gap: 12,
-    justifyContent: 'space-between',
     marginBottom: 12,
   },
   actionBtn: {
-    flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'row',       // horizontale Anordnung
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 12,
+    justifyContent: 'center',
+    gap: 4,                     // Abstand zwischen Icon & Text
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 20,           // runde Chips
     borderWidth: 1,
     borderColor: '#ddd',
     backgroundColor: '#fff',
   },
-  actionIcon: { fontSize: 16, width: 16, textAlign: 'center' },
+  actionIcon: { fontSize: 20,  textAlign: 'center', marginLeft: 2 },
   actionText: { fontSize: 14, fontWeight: '700' },
 
   // Visited-State (blau)
