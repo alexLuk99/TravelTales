@@ -6,10 +6,11 @@ const TOTAL_COUNTRIES = 195;
 type StatsProps = {
   visitedCountries: string[];
   wantToVisitCountries: string[];
+  onOpenMenu?: () => void; // 👈 neu
 };
 
 
-const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsProps) => {
+const StatisticsComponent = ({ visitedCountries, wantToVisitCountries, onOpenMenu }: StatsProps) => {
 
   const visitedCount = visitedCountries.length;
   const percentVisited = ((visitedCount / TOTAL_COUNTRIES) * 100).toFixed(0);
@@ -25,7 +26,7 @@ const StatisticsComponent = ({ visitedCountries, wantToVisitCountries }: StatsPr
           {/* Wishlist */}
           <Text style={[styles.wishlistText,]}>Wishlist: {wantToVisitCountries.length}</Text>
       </View>
-      <TouchableOpacity style={styles.burgerButton} onPress={() => {/* dein Handler */}}>
+      <TouchableOpacity style={styles.burgerButton} onPress={onOpenMenu}>
             <Text style={styles.burgerIcon}>☰</Text>
       </TouchableOpacity>
     </View>

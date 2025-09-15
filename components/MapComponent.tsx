@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, memo } from 'react';
 import Mapbox, { Camera, FillLayer, LineLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
 const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries }: any) => {
@@ -102,4 +102,4 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   );
 };
 
-export default MapComponent;
+export default memo(MapComponent);

@@ -210,4 +210,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CountryModal;
+export default React.memo(CountryModal);
