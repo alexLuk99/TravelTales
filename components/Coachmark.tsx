@@ -28,7 +28,12 @@ export default function Coachmark({ visible, text, onDismiss }: Props) {
   if (!visible) return null;
 
   return (
-    <View style={s.overlay}>
+    // 👇 lässt Touches zur Map durch (außer auf der Bubble)
+    <View style={s.overlay} pointerEvents="box-none">
+      {/* Dimmer zeichnet nur, fängt keine Touches */}
+      <Animated.View style={[s.scrim, { opacity }]} pointerEvents="none" />
+
+      {/* Interaktive Bubble */}
       <Animated.View style={[s.bubble, { opacity, transform: [{ translateY }] }]}>
         <Text style={s.title}>Hint</Text>
         <Text style={s.text}>{text}</Text>
@@ -44,10 +49,15 @@ export default function Coachmark({ visible, text, onDismiss }: Props) {
 const s = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
+    zIndex: 9999,                 // liegt über der Map
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingTop: 90,
-    backgroundColor: 'rgba(0,0,0,0.12)', // keeps the dimmed background
+  },
+  // eigener Scrim statt backgroundColor auf overlay
+  scrim: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.12)',
   },
   bubble: {
     maxWidth: '90%',
@@ -63,8 +73,8 @@ const s = StyleSheet.create({
     alignItems: 'center',
   },
   title: { fontSize: 14, fontWeight: '700', marginBottom: 4, color: '#111' },
-  text: { fontSize: 13, color: '#333', textAlign: 'center' },
-  cta: { marginTop: 10, fontSize: 12, color: '#117a8b', fontWeight: '700' },
+  text:  { fontSize: 13, color: '#333', textAlign: 'center' },
+  cta:   { marginTop: 10, fontSize: 12, color: '#117a8b', fontWeight: '700' },
   arrow: {
     position: 'absolute',
     bottom: -8,

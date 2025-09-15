@@ -52,8 +52,7 @@ export default function Map() {
             const seen = await AsyncStorage.getItem(SEEN_COACHMARK_KEY);
             if (v) setVisitedCountries(JSON.parse(v));
             if (w) setWantToVisitCountries(JSON.parse(w));
-            setShowCoachmark(true);
-            // if (!seen) setShowCoachmark(true); // nur beim ersten Start anzeigen
+            if (!seen) setShowCoachmark(true); // nur beim ersten Start anzeigen
           } catch (e) {
             console.error(e);
           }

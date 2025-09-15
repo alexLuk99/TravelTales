@@ -1,222 +1,223 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity  } from 'react-native';
+// CountryModal.tsx (überarbeitet)
+import React, { memo, useMemo } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
 
-const CountryModal = ({ 
-  isVisible, 
-  country, 
-  toggleVisited,
-  toggleWantToVisit, 
-  dismiss, 
-  onHideComplete,
-  visitedCountries, 
-  wantToVisitCountries,
-  hideCloseButton 
-}: any) => 
-    { if (!country) return null;
-        const visited = visitedCountries.includes(country.code);
-        const want = wantToVisitCountries.includes(country.code);
-
-        function countryCodeToEmoji(countryCode: string) {
-          return countryCode.toUpperCase().replace(/./g, char =>
-            String.fromCodePoint(127397 + char.charCodeAt(0))
-          );
-        }
-
-    return (
-        <Modal
-            isVisible={isVisible}
-            animationIn="slideInDown"
-            animationOut="slideOutUp"
-            hasBackdrop={false}
-            coverScreen={false}
-            animationInTiming={150}
-            animationOutTiming={600}
-            backdropTransitionOutTiming={600}
-            onBackButtonPress={dismiss}
-            onBackdropPress={dismiss}
-            onSwipeComplete={dismiss}
-            swipeDirection={['up','down']}
-            swipeThreshold={60}
-            useNativeDriver={true}
-            onModalHide={onHideComplete}
-            style={styles.modalWrapper}
-        >
-        <View style={styles.modal}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.modalTitleInline}>
-              {country.name_en}
-            </Text>
-            <Text style={styles.flagEmojiInline}>
-              {countryCodeToEmoji(country.iso_3166_1)}
-            </Text>
-          </View>
-
-          <View style={styles.checkboxRow}>
-          <View style={styles.checkboxContainer}>
-            <Text style={[styles.checkboxLabel, { color: '#3bb2d0' }]}>Visited</Text>
-            <TouchableOpacity
-              style={[styles.checkbox, visited && styles.checkboxOn]}
-              onPress={() => {
-                toggleVisited(country.code);
-                dismiss();
-              }}
-            >
-              <Text style={[styles.checkboxText, { color: '#3bb2d0' }]}>
-                {visited ? '✓' : ''}
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.checkboxContainer}>
-            <Text style={[styles.checkboxLabel, { color: '#f4a261' }]}>Wishlist</Text>
-            <TouchableOpacity
-              style={[styles.checkbox, want && styles.checkboxWish]}
-              onPress={() => {
-                toggleWantToVisit(country.code);
-                dismiss();
-              }}
-            >
-              <Text style={[styles.checkboxText, { color: '#f4a261' }]}>
-                {want ? '★' : ''}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          </View>
-          {!hideCloseButton && (
-            <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
-              <Text style={styles.topCloseButtonText}>×</Text>
-            </TouchableOpacity>
-          )}
-      </View>
-    </Modal>
-    );
+type Country = {
+  name_en: string;
+  code: string;         // ISO3
+  iso_3166_1: string;   // ISO2
 };
 
-const styles = StyleSheet.create({
-  modalWrapper: {
+type Props = {
+  isVisible: boolean;
+  country: Country | null;
+  toggleVisited: (code3: string) => void;
+  toggleWantToVisit: (code3: string) => void;
+  dismiss: () => void;
+  onHideComplete?: () => void;
+  visitedCountries: string[];
+  wantToVisitCountries: string[];
+  hideCloseButton?: boolean;
+};
+
+function countryCodeToEmoji(alpha2: string) {
+  return alpha2?.toUpperCase()?.replace(/./g, (c) =>
+    String.fromCodePoint(127397 + c.charCodeAt(0))
+  );
+}
+
+function CountryModalBase({
+  isVisible,
+  country,
+  toggleVisited,
+  toggleWantToVisit,
+  dismiss,
+  onHideComplete,
+  visitedCountries,
+  wantToVisitCountries,
+  hideCloseButton,
+}: Props) {
+  const visited = useMemo(
+    () => !!country && visitedCountries.includes(country.code),
+    [visitedCountries, country]
+  );
+  const want = useMemo(
+    () => !!country && wantToVisitCountries.includes(country.code),
+    [wantToVisitCountries, country]
+  );
+
+  if (!country) return null;
+
+  return (
+    <Modal
+      isVisible={isVisible}
+      onBackdropPress={dismiss}
+      onBackButtonPress={dismiss}
+      onSwipeComplete={dismiss}
+      swipeDirection={['up','down']}
+      swipeThreshold={60}
+      useNativeDriver={true}
+      hasBackdrop={false}
+      coverScreen={false}
+      animationIn="slideInDown"
+      animationOut="slideOutUp"
+      animationInTiming={220}
+      animationOutTiming={200}
+      backdropTransitionOutTiming={200}
+      onModalHide={onHideComplete}
+      style={s.sheetWrapper} // ⬅️ wie im OverviewModal: am unteren Rand
+    >
+       <View style={s.box}>
+      {/* Header */}
+      <View style={s.header}>
+        <View style={s.centerTitleRow}>
+          <Text style={s.flag}>{countryCodeToEmoji(country.iso_3166_1)}</Text>
+          <Text style={s.title} numberOfLines={1}>{country.name_en}</Text>
+        </View>
+
+        {!hideCloseButton && (
+          <TouchableOpacity
+            onPress={dismiss}
+            accessibilityRole="button"
+            accessibilityLabel="Close country details"
+            style={s.closeBtn}                 // <-- WICHTIG: style hinzufügen
+          >
+            <Text style={s.close}>×</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* Actions */}
+      <View style={s.actions}>
+        <TouchableOpacity
+          style={[s.actionBtn, visited && s.actionOnVisited]}
+          onPress={() => { toggleVisited(country.code); dismiss(); }}
+          accessibilityRole="button"
+          accessibilityLabel={visited ? 'Remove from Visited' : 'Mark as Visited'}
+        >
+          <Text style={[s.actionIcon, s.visitedIcon]}>{visited ? '✓' : ' '}</Text>
+          <Text style={[s.actionText, s.visitedText]}>Visited</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[s.actionBtn, want && s.actionOnWish]}
+          onPress={() => { toggleWantToVisit(country.code); dismiss(); }}
+          accessibilityRole="button"
+          accessibilityLabel={want ? 'Remove from Wishlist' : 'Add to Wishlist'}
+        >
+          <Text style={[s.actionIcon, s.wishIcon]}>{want ? '★' : ' '}</Text>
+          <Text style={[s.actionText, s.wishText]}>Wishlist</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Grabber ganz unten im Modal */}
+      <View style={s.grabber} />
+    </View>
+  </Modal>
+  );
+}
+
+export default memo(CountryModalBase);
+
+const s = StyleSheet.create({
+  sheetWrapper: {
     justifyContent: 'flex-start',
     alignItems: 'center',
-    margin: 10,
-    pointerEvents: 'auto',
+    margin: 0,
+    paddingHorizontal: 8,
+    paddingTop: 10, // kleiner Abstand zur Statusbar
   },
-  flagEmoji: {
-    fontSize: 40,        // Größe des Emoji
-    marginBottom: 10,
-    textAlign: 'center',
+  box: {
+    width: '96%',
+    backgroundColor: 'white',
+    borderRadius: 14,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
   },
-  checkboxContainer: {
-    flexDirection: 'row', 
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  checkboxRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    marginVertical: 1
-  },
-  checkboxLabel: {
-    fontSize: 18,
-    marginRight: 10,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderWidth: 1,
-    borderColor: '#ccc',
+
+  // Header oben
+  header: {
+    position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 12,
+    paddingRight: 28, // Platz für Close-Button
   },
-  checkboxDisabled: {
-    opacity: 0.3,                // ausgegraut
-    borderColor: '#999',
-    },
-  checkboxText: {
-    fontSize: 18,
-    color: '#f4a261'
-  },
-  checkboxOn: {
-    borderColor: '#3bb2d0',
-    backgroundColor: 'rgba(59,178,208,0.15)',
-  },
-  checkboxWish: {
-    borderColor: '#f4a261',
-    backgroundColor: 'rgba(244,162,97,0.12)',
-  },
-  modal: {
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    padding: 2,
-    borderRadius: 0,   // Leichte Abrundung für ein moderneres Design
-    width: '100%',       // Nimmt 90% der Bildschirmbreite ein, also weniger als den ganzen Screen
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  titleContainer: {
+  centerTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    maxWidth: '88%',
+  },
+  flag: { fontSize: 22, lineHeight: 22 },
+  title: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#111',
+    textAlign: 'center',
+    flexShrink: 1,
+  },
+
+  // Close-Button oben rechts
+  closeBtn: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    padding: 4,
+  },
+  close: { fontSize: 24, lineHeight: 24 },
+
+  // Action-Buttons
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'space-between',
     marginBottom: 12,
   },
-  flagEmojiInline: {
-    fontSize: 26,
-    marginLeft: 8,
-  },
-  buttonContainer: {
-    flexDirection: 'row',           // Ordnet die Buttons nebeneinander an
-    justifyContent: 'space-between',// Gleichmäßiger Abstand
-    width: '100%',                  // Container nimmt die gesamte Breite des Modals ein
-  },
-  primaryButton: {
-    backgroundColor: '#3bb2d0',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginBottom: 10,
-    width: '50%',
-  },
-  primaryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  closeButton: {
-    backgroundColor: '#fbb03b',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    color: 'white',
-    fontSize: 18,
-    textAlign: 'center',
-  },
-  topCloseButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#fbb03b',
-    justifyContent: 'center',
+  actionBtn: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
   },
-  modalTitleInline: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
+  actionIcon: { fontSize: 16, width: 16, textAlign: 'center' },
+  actionText: { fontSize: 14, fontWeight: '700' },
+
+  // Visited-State (blau)
+  visitedText: { color: '#117a8b' },
+  visitedIcon: { color: '#3bb2d0' },
+  actionOnVisited: {
+    borderColor: '#3bb2d0',
+    backgroundColor: 'rgba(59,178,208,0.10)',
   },
-  topCloseButtonText: {
-    color: 'white',
-    fontSize: 20,
-    lineHeight: 20,
-    alignItems: 'center',
+
+  // Wishlist-State (orange)
+  wishText: { color: '#9a5a27' },
+  wishIcon: { color: '#f4a261' },
+  actionOnWish: {
+    borderColor: '#f4a261',
+    backgroundColor: 'rgba(244,162,97,0.10)',
+  },
+
+  // Grabber ganz unten
+  grabber: {
+    alignSelf: 'center',
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    marginTop: 8,
   },
 });
 
-export default React.memo(CountryModal);
