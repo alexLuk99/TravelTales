@@ -10,8 +10,10 @@ import * as Haptics from 'expo-haptics';
 import OverviewModal from './OverviewModal';
 import { COUNTRY_SECTIONS  } from '@/components/data/countries';
 import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
+import Coachmark from './Coachmark';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
+const SEEN_COACHMARK_KEY = 'seenCoachmarkV1';
 
 export default function Map() {
     const { location, errorMsg } = useUserLocation();
@@ -20,6 +22,7 @@ export default function Map() {
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isOverviewOpen, setIsOverviewOpen] = useState(false);
+    const [showCoachmark, setShowCoachmark] = useState(false);
 
     const fillLayerStyle = useMemo(() => ({
         fillColor: '#3bb2d0',
@@ -43,16 +46,26 @@ export default function Map() {
 
     useEffect(() => {
         (async () => {
-            try {
-                const v = await AsyncStorage.getItem('visitedCountries');
-                const w = await AsyncStorage.getItem('wantToVisitCountries');
-                if (v) setVisitedCountries(JSON.parse(v));
-                if (w) setWantToVisitCountries(JSON.parse(w));
-            } catch (e) {
-                console.error(e);
-            }
+          try {
+            const v = await AsyncStorage.getItem('visitedCountries');
+            const w = await AsyncStorage.getItem('wantToVisitCountries');
+            const seen = await AsyncStorage.getItem(SEEN_COACHMARK_KEY);
+            if (v) setVisitedCountries(JSON.parse(v));
+            if (w) setWantToVisitCountries(JSON.parse(w));
+            setShowCoachmark(true);
+            // if (!seen) setShowCoachmark(true); // nur beim ersten Start anzeigen
+          } catch (e) {
+            console.error(e);
+          }
         })();
-    }, []);
+      }, []);
+
+      const dismissCoachmark = useCallback(async () => {
+        try {
+          setShowCoachmark(false);
+          await AsyncStorage.setItem(SEEN_COACHMARK_KEY, '1');
+        } catch {}
+      }, []);
 
     const dismissModal = () => setIsModalVisible(false);
     const handleModalHide = () => setSelectedCountry(null);
@@ -116,12 +129,17 @@ export default function Map() {
                 isModalVisible={isModalVisible}
                 hideCloseButton={true}
             />
+            <Coachmark
+                visible={showCoachmark}
+                onDismiss={dismissCoachmark}
+                text="Tap on a country to mark it as Visited or add it to your Wishlist."
+            />
             <CountryModal
                 isVisible={isModalVisible}
                 onHideComplete={handleModalHide}
                 country={selectedCountry}
-                toggleVisited={toggleVisitedCountry}
-                toggleWantToVisit={toggleWantToVisitCountry}
+                toggleVisited={(code: string) => { toggleVisitedCountry(code); }}
+                toggleWantToVisit={(code: string) => { toggleWantToVisitCountry(code); }}
                 dismiss={dismissModal}
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
@@ -138,8 +156,8 @@ export default function Map() {
                 sections={COUNTRY_SECTIONS}
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
-                onToggleVisited={toggleVisitedCountry}
-                onToggleWishlist={toggleWantToVisitCountry}
+                onToggleVisited={(code: string) => { toggleVisitedCountry(code); }}
+                onToggleWishlist={(code: string) => { toggleWantToVisitCountry(code); }}
            />
         </View>
     );

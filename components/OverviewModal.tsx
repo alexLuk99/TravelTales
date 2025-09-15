@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, type ListRenderItem } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
@@ -52,6 +52,7 @@ function OverviewModalBase({
   onToggleVisited,
   onToggleWishlist,
 }: Props) {
+
   const visitedSet = useMemo(() => new Set(visitedCountries), [visitedCountries]);
   const wishSet    = useMemo(() => new Set(wantToVisitCountries), [wantToVisitCountries]);
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
@@ -105,17 +106,10 @@ function OverviewModalBase({
 
   const getItemType = useCallback((it: FlatRow) => it.type, []);
 
-  const overrideItemLayout = useCallback(
-    (layout: {size: number; span?: number}, item: FlatRow, index: number) => {
-      layout.size = item.type === 'header' ? 30 : 44;
-    },
-    []
-  );
-
   return (
     <Modal
       isVisible={visible}
-      // onBackdropPress={onClose}
+      onBackdropPress={onClose}
       onBackButtonPress={onClose}
       useNativeDriver={true}
       animationOut="slideOutDown"
@@ -138,7 +132,7 @@ function OverviewModalBase({
             style={[s.filterBtn, filterMode === 'all' && s.filterBtnOn]}
             onPress={() => setFilterMode('all')}
           >
-            <Text style={[s.filterText, filterMode === 'all' && s.filterTextOn]}>Alle</Text>
+            <Text style={[s.filterText, filterMode === 'all' && s.filterTextOn]}>All</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[s.filterBtn, filterMode === 'visited' && s.filterBtnOn]}
@@ -158,7 +152,12 @@ function OverviewModalBase({
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 420 }}>
+        {/* <View style={s.columnHeaderRow}>
+          <Text style={[s.columnHeader, { marginLeft: 0 }]}>Visited</Text>
+          <Text style={[s.columnHeader, { marginLeft: 0 }]}>Wishlist</Text>
+        </View> */}
+
+        <View style={{ height: 420}}>
           <FlashList
             data={data}
             renderItem={renderItem}
@@ -188,6 +187,17 @@ const s = StyleSheet.create({
     borderTopRightRadius: 16,
     padding: 16,
     maxHeight: '85%',
+  },
+  columnHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 8,
+    marginBottom: 4,
+  },
+  columnHeader: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#666',
   },
   filters: {
     flexDirection: 'row',

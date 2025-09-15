@@ -1,4 +1,3 @@
-// src/data/countries.ts
 import raw from '@/assets/countries.json';
 
 export type Country = {

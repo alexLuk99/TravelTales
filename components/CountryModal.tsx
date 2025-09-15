@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Button, StyleSheet, TouchableWithoutFeedback, TouchableOpacity  } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity  } from 'react-native';
 import Modal from 'react-native-modal';
 
 const CountryModal = ({ 
@@ -53,34 +53,35 @@ const CountryModal = ({
           </View>
 
           <View style={styles.checkboxRow}>
-            <View style={styles.checkboxContainer}>
-              <Text style={styles.checkboxLabel}>Visited</Text>
-              <TouchableOpacity
-                style={styles.checkbox}
-                onPress={() => {
-                  toggleVisited(country.code);
-                  dismiss();
-                }}
-              >
-                <Text style={styles.checkboxText}>
-                  {visited ? '✓' : ''}
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.checkboxContainer}>
-              <Text style={styles.checkboxLabel}>Wishlist</Text>
-              <TouchableOpacity
-                style={styles.checkbox}
-                onPress={() => {
-                  toggleWantToVisit(country.code);
-                  dismiss();
-                }}
-              >
-                <Text style={styles.checkboxText}>
-                  {want ? '★' : ''}
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.checkboxContainer}>
+            <Text style={[styles.checkboxLabel, { color: '#3bb2d0' }]}>Visited</Text>
+            <TouchableOpacity
+              style={[styles.checkbox, visited && styles.checkboxOn]}
+              onPress={() => {
+                toggleVisited(country.code);
+                dismiss();
+              }}
+            >
+              <Text style={[styles.checkboxText, { color: '#3bb2d0' }]}>
+                {visited ? '✓' : ''}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.checkboxContainer}>
+            <Text style={[styles.checkboxLabel, { color: '#f4a261' }]}>Wishlist</Text>
+            <TouchableOpacity
+              style={[styles.checkbox, want && styles.checkboxWish]}
+              onPress={() => {
+                toggleWantToVisit(country.code);
+                dismiss();
+              }}
+            >
+              <Text style={[styles.checkboxText, { color: '#f4a261' }]}>
+                {want ? '★' : ''}
+              </Text>
+            </TouchableOpacity>
+          </View>
           </View>
           {!hideCloseButton && (
             <TouchableOpacity style={styles.topCloseButton} onPress={dismiss}>
@@ -134,6 +135,14 @@ const styles = StyleSheet.create({
   checkboxText: {
     fontSize: 18,
     color: '#f4a261'
+  },
+  checkboxOn: {
+    borderColor: '#3bb2d0',
+    backgroundColor: 'rgba(59,178,208,0.15)',
+  },
+  checkboxWish: {
+    borderColor: '#f4a261',
+    backgroundColor: 'rgba(244,162,97,0.12)',
   },
   modal: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
