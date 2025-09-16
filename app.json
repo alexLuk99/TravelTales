@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TravelTracker",
-    "slug": "TravelTracker",
+    "name": "TravelTales",
+    "slug": "TravelTales",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,7 +16,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.alexluk.TravelTracker",
+      "package": "com.alexluk.TravelTales",
       "permissions": [
         "ACCESS_COARSE_LOCATION", 
         "ACCESS_FINE_LOCATION", 
