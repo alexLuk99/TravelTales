@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "TravelTales",
-    "slug": "TravelTales",
+    "slug": "TravelTracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -18,9 +18,14 @@
       },
       "package": "com.alexluk.TravelTales",
       "permissions": [
-        "ACCESS_COARSE_LOCATION", 
-        "ACCESS_FINE_LOCATION", 
-        "ACCESS_BACKGROUND_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION"
       ]
     },
     "web": {
