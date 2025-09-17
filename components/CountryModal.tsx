@@ -63,10 +63,10 @@ function CountryModalBase({
       animationIn="slideInDown"
       animationOut="slideOutUp"
       animationInTiming={220}
-      animationOutTiming={200}
-      backdropTransitionOutTiming={200}
+      animationOutTiming={500}
+      backdropTransitionOutTiming={500}
       onModalHide={onHideComplete}
-      style={s.sheetWrapper} // ⬅️ wie im OverviewModal: am unteren Rand
+      style={s.sheetWrapper}
     >
        <View style={s.box}>
       {/* Header */}

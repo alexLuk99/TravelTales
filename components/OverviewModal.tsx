@@ -80,7 +80,6 @@ function OverviewModalBase({
     [data]
   );
 
-
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FlatRow>) => {
       if (item.type === 'header') {
@@ -105,6 +104,15 @@ function OverviewModalBase({
   );
 
   const getItemType = useCallback((it: FlatRow) => it.type, []);
+
+  const extraVersion = useMemo(
+    () => ({
+      v: visitedCountries.join('|'),
+      w: wantToVisitCountries.join('|'),
+      f: filterMode,
+    }),
+    [visitedCountries, wantToVisitCountries, filterMode]
+  );
 
   return (
     <Modal
@@ -163,13 +171,13 @@ function OverviewModalBase({
             renderItem={renderItem}
             keyExtractor={(it: FlatRow) => it.key}
             getItemType={getItemType}
-            // estimatedItemSize={44} // falls deine Version das schon kann
+            estimatedItemSize={44} // falls deine Version das schon kann
             stickyHeaderIndices={stickyHeaderIndices}
             drawDistance={800}
             showsVerticalScrollIndicator
             contentContainerStyle={{ paddingBottom: 16 }}
-            style={{ flex: 1 }}
             ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
+            extraData={extraVersion}  
           />
         </View>
       </View>
