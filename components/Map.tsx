@@ -1,6 +1,6 @@
 import Mapbox from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
@@ -23,6 +23,15 @@ export default function Map() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isOverviewOpen, setIsOverviewOpen] = useState(false);
     const [showCoachmark, setShowCoachmark] = useState(false);
+    const closingOverviewRef = useRef(false);
+    const openOverview = useCallback(() => setIsOverviewOpen(true), []);
+
+    const closeOverview = useCallback(() => {
+      if (closingOverviewRef.current) return;
+      closingOverviewRef.current = true;
+      setIsOverviewOpen(false);
+      setTimeout(() => { closingOverviewRef.current = false; }, 450); // > animationOutTiming
+    }, []);
 
     const fillLayerStyle = useMemo(() => ({
         fillColor: '#3bb2d0',
@@ -146,11 +155,11 @@ export default function Map() {
             <StatisticsComponent
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
-                onOpenMenu={() => setIsOverviewOpen(true)}
+                onOpenMenu={openOverview}
             />
             <OverviewModal 
                 visible={isOverviewOpen}
-                onClose={() => setIsOverviewOpen(false)}
+                onClose={closeOverview}
                 title="Overview"
                 sections={COUNTRY_SECTIONS}
                 visitedCountries={visitedCountries}

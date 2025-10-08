@@ -1,16 +1,9 @@
 import React, { memo, useMemo, useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
-
-type Country = {
-  name_en: string;
-  iso_3166_1_alpha_3: string;
-  iso_3166_1: string;
-  continent?: string;
-  region?: string;
-};
+import { Country } from './data/countries';
 
 type Section = { title: string; data: Country[] };
 
@@ -29,16 +22,16 @@ type FlatRow =
   | { type: 'header'; key: string; title: string }
   | { type: 'country'; key: string; item: Country };
 
-function flattenSections(sections: Section[]): FlatRow[] {
-  const out: FlatRow[] = [];
-  for (const sec of sections) {
-    out.push({ type: 'header', key: `h:${sec.title}`, title: sec.title });
-    for (const c of sec.data) {
-      out.push({ type: 'country', key: c.iso_3166_1_alpha_3, item: c });
+  function flattenSections(sections: Section[]): FlatRow[] {
+    const out: FlatRow[] = [];
+    for (const sec of sections) {
+      out.push({ type: 'header', key: `h:${sec.title}`, title: sec.title });
+      for (const c of sec.data) {
+        out.push({ type: 'country', key: c.iso_3166_1_alpha_3, item: c });
+      }
     }
+    return out;
   }
-  return out;
-}
 
 type FilterMode = 'all' | 'visited' | 'wishlist';
 
@@ -55,7 +48,9 @@ function OverviewModalBase({
 
   const visitedSet = useMemo(() => new Set(visitedCountries), [visitedCountries]);
   const wishSet    = useMemo(() => new Set(wantToVisitCountries), [wantToVisitCountries]);
+
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
+  const [isContentVisible, setContentVisible] = useState(false);
 
   const filteredSections = useMemo(() => {
     if (filterMode === 'all') return sections;
@@ -79,6 +74,7 @@ function OverviewModalBase({
     () => data.map((row, i) => (row.type === 'header' ? i : -1)).filter(i => i !== -1),
     [data]
   );
+
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FlatRow>) => {
@@ -117,10 +113,23 @@ function OverviewModalBase({
   return (
     <Modal
       isVisible={visible}
-      onBackdropPress={onClose}
-      onBackButtonPress={onClose}
-      useNativeDriver={true}
-      animationOut="slideOutDown"
+      backdropTransitionOutTiming={1}
+      // onBackdropPress={onClose}
+      // onBackButtonPress={onClose}
+      // backdropOpacity={0.3}
+      // useNativeDriver={true}
+      // useNativeDriverForBackdrop={true}
+      // onModalShow={() => setContentVisible(true)}
+      // onModalHide={() => setContentVisible(false)}
+      // hideModalContentWhileAnimating
+      // animationIn="slideInUp"
+      // animationOut="slideOutDown"
+      // animationInTiming={200}
+      // animationOutTiming={200}
+      // backdropTransitionInTiming={0}
+      // backdropTransitionOutTiming={0}
+      // deviceHeight={deviceHeight}
+      // deviceWidth={deviceWidth}
       // hasBackdrop={false}
       // coverScreen={false}
       // onSwipeComplete={onClose}
@@ -130,10 +139,10 @@ function OverviewModalBase({
     >
       <View style={s.box}>
         <View style={s.grabber} />
-        <View style={s.header}>
-          <Text style={s.title}>{title ?? 'Overview'}</Text>
-          <TouchableOpacity onPress={onClose}><Text style={s.close}>×</Text></TouchableOpacity>
-        </View>
+          <View style={s.header}>
+            <Text style={s.title}>{title ?? 'Overview'}</Text>
+            <TouchableOpacity onPress={onClose}><Text style={s.close}>×</Text></TouchableOpacity>
+          </View>
 
         <View style={s.filters}>
           <TouchableOpacity
@@ -160,24 +169,30 @@ function OverviewModalBase({
           </TouchableOpacity>
         </View>
 
-        {/* <View style={s.columnHeaderRow}>
+        {/* {/* <View style={s.columnHeaderRow}>
           <Text style={[s.columnHeader, { marginLeft: 0 }]}>Visited</Text>
           <Text style={[s.columnHeader, { marginLeft: 0 }]}>Wishlist</Text>
-        </View> */}
-
+        // </View> */}
+ 
         <View style={{ height: 420}}>
           <FlashList
             data={data}
             renderItem={renderItem}
-            keyExtractor={(it: FlatRow) => it.key}
-            getItemType={getItemType}
-            estimatedItemSize={44} // falls deine Version das schon kann
+            keyExtractor={(it) => it.key}
+            getItemType={(it) => it.type}
+            estimatedItemSize={44}
+            removeClippedSubviews={false}
+            extraData={extraVersion}
+            overrideItemLayout={(layout /*, item*/) => {
+              layout.size = 44; // deine Row: 28 (Checkbox) + 8+8 Padding = ~44
+              layout.span = 1;
+            }}
             stickyHeaderIndices={stickyHeaderIndices}
             drawDistance={800}
-            showsVerticalScrollIndicator
-            contentContainerStyle={{ paddingBottom: 16 }}
-            ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
-            extraData={extraVersion}  
+            // showsVerticalScrollIndicator
+            // contentContainerStyle={{ paddingBottom: 16 }}
+            // ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
+            // extraData={extraVersion} 
           />
         </View>
       </View>
