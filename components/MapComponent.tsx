@@ -46,8 +46,11 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       scaleBarEnabled={false}
       preferredFramesPerSecond={60}
       compassEnabled={true}
-      compassFadeWhenNorth={false} 
+      compassFadeWhenNorth={true} 
       compassPosition={{  top: 200, right: 5 }}
+      zoomEnabled={true}
+      logoEnabled={false}
+      attributionPosition={{ bottom: 5, left: 5 }}
     >
       <VectorSource
         id="global-layer-source"
@@ -60,6 +63,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
             }
           }
         }}
+        hitbox={{ width: 0, height: 0 }}
       >
         <FillLayer
           id="highlight-layer"
