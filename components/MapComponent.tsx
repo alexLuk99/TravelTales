@@ -102,7 +102,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       </VectorSource>
       <Camera followZoomLevel={0.9} followUserLocation />
       <LocationPuck pulsing={{ isEnabled: true }} />
-    </MapView>
+    </MapView> //rest
   );
 };
 
