@@ -58,7 +58,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     <MapView
       style={{ flex: 1 }}
       styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc"
-      projection="mercator"
+      projection="globe"
       scaleBarEnabled={false}
       preferredFramesPerSecond={60}
       compassEnabled={true}
@@ -73,6 +73,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
         url="mapbox://mapbox.country-boundaries-v1"
         onPress={handlePress}
         hitbox={{ width: 0.5, height: 0.5 }}
+        
       >
         <FillLayer
           id="highlight-layer"
