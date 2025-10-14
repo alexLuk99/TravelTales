@@ -1,7 +1,7 @@
 import Mapbox from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
 import MapComponent from './MapComponent';
@@ -9,7 +9,6 @@ import StatisticsComponent from './StatisticsComponent';
 import * as Haptics from 'expo-haptics';
 import OverviewModal from './OverviewModal';
 import { COUNTRY_SECTIONS  } from '@/components/data/countries';
-import countriesGeoJSON from '@/assets/data/countries-github.json';
 import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
 import Coachmark from './Coachmark';
 
@@ -17,7 +16,7 @@ Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 const SEEN_COACHMARK_KEY = 'seenCoachmarkV1';
 
 export default function Map() {
-    const { errorMsg } = useUserLocation();
+    const { location, errorMsg } = useUserLocation();
     const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
     const [wantToVisitCountries, setWantToVisitCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
@@ -38,7 +37,7 @@ export default function Map() {
         fillColor: '#3bb2d0',
         fillOpacity: [
             'case',
-            ['in', ['get', 'iso_a3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
+            ['in', ['get', 'iso_3166_1_alpha_3'], ["literal", visitedCountries.length ? visitedCountries : ["NONE"]]],
             0,
             0.7
         ],
@@ -46,7 +45,12 @@ export default function Map() {
     }), [visitedCountries]);
 
     const filterWorldView = useMemo(() => ([
-        'all',
+        "all",
+        ["any",
+            ["==", "all", ["get", "worldview"]],
+            ["in", "US", ["get", "worldview"]]
+        ],
+        ["==", ["get", "disputed"], "false"]
     ]), []);
 
     useEffect(() => {
@@ -78,11 +82,7 @@ export default function Map() {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(()=>{});
         setVisitedCountries(prev => {
           const v = new Set(prev);
-          if (v.has(code)) {
-            v.delete(code);
-          } else {
-            v.add(code);
-          }
+          v.has(code) ? v.delete(code) : v.add(code);
           return [...v];
         });
         setWantToVisitCountries(prev => {
@@ -96,11 +96,7 @@ export default function Map() {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(()=>{});
         setWantToVisitCountries(prev => {
           const w = new Set(prev);
-          if (w.has(code)) {
-            w.delete(code);
-          } else {
-            w.add(code);
-          }
+          w.has(code) ? w.delete(code) : w.add(code);
           return [...w];
         });
         setVisitedCountries(prev => {
@@ -109,12 +105,6 @@ export default function Map() {
           return [...v];
         });
       }, []);
-
-    useEffect(() => {
-        if (errorMsg) {
-            console.warn(errorMsg);
-        }
-    }, [errorMsg]);
 
     const handleCountryClick = (countryCode: string, countryName: string, countryCodeAlpha2: string) => {
         if (selectedCountry && selectedCountry.code === countryCode) {
@@ -126,18 +116,26 @@ export default function Map() {
         }
     };
 
+    let text = 'Waiting...';
+    if (errorMsg) {
+        text = errorMsg;
+    } else if (location) {
+        text = JSON.stringify(location);
+    }
+
     useDebouncedPersist(visitedCountries, wantToVisitCountries);
 
     return (
         <View style={{ flex: 1 }}>
             <MapComponent
+                visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
                 handleCountryClick={handleCountryClick}
                 fillLayerStyle={fillLayerStyle}
                 filterWorldView={filterWorldView}
-                countriesGeoJSON={countriesGeoJSON}
                 country={selectedCountry}
                 isModalVisible={isModalVisible}
+                hideCloseButton={true}
             />
             <Coachmark
                 visible={showCoachmark}
