@@ -37,7 +37,7 @@ export default function Map() {
         fillColor: '#3bb2d0',
         fillOpacity: [
             'case',
-            ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
+            ['in', ['get', 'iso_3166_1_alpha_3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
             0,
             0.7
         ],
@@ -170,3 +170,4 @@ export default function Map() {
         </View>
     );
 }
+
