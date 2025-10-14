@@ -1,7 +1,9 @@
-import React, { useMemo, useCallback, memo } from 'react';
+import React, { useMemo, useCallback, memo, useState } from 'react';
 import Mapbox, { Camera, FillLayer, LineLayer, LocationPuck, MapView, VectorSource } from '@rnmapbox/maps';
 
 const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries }: any) => {
+  
+  const [loaded, setLoaded] = useState(false);
   
   const highlightLayerStyle = useMemo(() => ({
     fillColor: '#fbb03b',
@@ -62,18 +64,18 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
       scaleBarEnabled={false}
       preferredFramesPerSecond={60}
       compassEnabled={true}
-      compassFadeWhenNorth={true} 
+      compassFadeWhenNorth={loaded}
       compassPosition={{  top: 200, right: 5 }}
       zoomEnabled={true}
       logoEnabled={false}
       attributionPosition={{ bottom: 5, left: 5 }}
+      onDidFinishLoadingMap={() => setLoaded(true)}
     >
       <VectorSource
         id="global-layer-source"
         url="mapbox://mapbox.country-boundaries-v1"
         onPress={handlePress}
         hitbox={{ width: 0.5, height: 0.5 }}
-        
       >
         <FillLayer
           id="highlight-layer"
