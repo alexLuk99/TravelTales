@@ -9,6 +9,7 @@ import StatisticsComponent from './StatisticsComponent';
 import * as Haptics from 'expo-haptics';
 import OverviewModal from './OverviewModal';
 import { COUNTRY_SECTIONS  } from '@/components/data/countries';
+import countriesGeoJSON from '@/assets/data/countries-github.json';
 import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
 import Coachmark from './Coachmark';
 
@@ -37,7 +38,7 @@ export default function Map() {
         fillColor: '#3bb2d0',
         fillOpacity: [
             'case',
-            ['in', ['get', 'ISO3166-1-Alpha-3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
+            ['in', ['get', 'iso_a3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
             0,
             0.7
         ],
@@ -134,6 +135,7 @@ export default function Map() {
                 handleCountryClick={handleCountryClick}
                 fillLayerStyle={fillLayerStyle}
                 filterWorldView={filterWorldView}
+                countriesGeoJSON={countriesGeoJSON}
                 country={selectedCountry}
                 isModalVisible={isModalVisible}
             />
