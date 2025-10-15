@@ -1,4 +1,3 @@
-// CountryModal.tsx (überarbeitet)
 import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';

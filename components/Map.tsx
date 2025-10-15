@@ -37,7 +37,7 @@ export default function Map() {
         fillColor: '#3bb2d0',
         fillOpacity: [
             'case',
-            ['in', ['get', 'iso_3166_1_alpha_3'], ["literal", visitedCountries.length ? visitedCountries : ["NONE"]]],
+            ['in', ['get', 'iso_a3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
             0,
             0.7
         ],
@@ -45,12 +45,8 @@ export default function Map() {
     }), [visitedCountries]);
 
     const filterWorldView = useMemo(() => ([
-        "all",
-        ["any",
-            ["==", "all", ["get", "worldview"]],
-            ["in", "US", ["get", "worldview"]]
-        ],
-        ["==", ["get", "disputed"], "false"]
+        'all',
+        ['has', 'iso_a3'],
     ]), []);
 
     useEffect(() => {
