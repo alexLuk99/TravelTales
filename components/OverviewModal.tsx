@@ -1,5 +1,5 @@
-import React, { memo, useMemo, useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, InteractionManager, Animated, PanResponder } from 'react-native';
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
@@ -49,6 +49,94 @@ function OverviewModalBase({
 
   const [filterMode, setFilterMode] = useState<FilterMode>('all');
   const [isContentVisible, setContentVisible] = useState(false);
+  const sheetTranslate = useRef(new Animated.Value(0)).current;
+  const interactionRef = useRef<ReturnType<typeof InteractionManager.runAfterInteractions> | null>(null);
+  const fallbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearPending = useCallback(() => {
+    if (interactionRef.current) {
+      interactionRef.current.cancel();
+      interactionRef.current = null;
+    }
+    if (fallbackTimeoutRef.current) {
+      clearTimeout(fallbackTimeoutRef.current);
+      fallbackTimeoutRef.current = null;
+    }
+    sheetTranslate.setValue(0);
+  }, [sheetTranslate]);
+
+  useEffect(() => {
+    if (!visible) {
+      clearPending();
+      setContentVisible(false);
+      return;
+    }
+
+    clearPending();
+    setContentVisible(false);
+
+    interactionRef.current = InteractionManager.runAfterInteractions(() => {
+      setContentVisible(true);
+      interactionRef.current = null;
+    });
+
+    fallbackTimeoutRef.current = setTimeout(() => {
+      setContentVisible(true);
+      if (interactionRef.current) {
+        interactionRef.current.cancel();
+        interactionRef.current = null;
+      }
+      fallbackTimeoutRef.current = null;
+    }, 260);
+
+    return clearPending;
+  }, [visible, clearPending]);
+
+  const handleModalHide = useCallback(() => {
+    clearPending();
+    setContentVisible(false);
+  }, [clearPending]);
+
+  const closeModal = useCallback(() => {
+    sheetTranslate.setValue(0);
+    onClose();
+  }, [onClose, sheetTranslate]);
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => false,
+        onMoveShouldSetPanResponder: (_, gesture) =>
+          visible && gesture.dy > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+        onPanResponderMove: (_, gesture) => {
+          const offset = Math.max(0, gesture.dy);
+          sheetTranslate.setValue(offset);
+        },
+        onPanResponderRelease: (_, gesture) => {
+          const shouldClose = gesture.dy > 140 || gesture.vy > 1.1;
+          if (shouldClose) {
+            closeModal();
+          } else {
+            Animated.spring(sheetTranslate, {
+              toValue: 0,
+              useNativeDriver: true,
+              speed: 18,
+              bounciness: 0,
+            }).start();
+          }
+        },
+        onPanResponderTerminate: () => {
+          Animated.spring(sheetTranslate, {
+            toValue: 0,
+            useNativeDriver: true,
+            speed: 18,
+            bounciness: 0,
+          }).start();
+        },
+        onPanResponderTerminationRequest: () => false,
+      }),
+    [visible, sheetTranslate, closeModal]
+  );
 
   const filteredSections = useMemo(() => {
     if (filterMode === 'all') return sections;
@@ -112,29 +200,39 @@ function OverviewModalBase({
     <Modal
       isVisible={visible}
       useNativeDriver
-      useNativeDriverForBackdrop
+      useNativeDriverForBackdrop={false}
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      onModalShow={() => setContentVisible(true)}
-      onModalHide={() => setContentVisible(false)}
-      onBackdropPress={onClose}
-      onBackButtonPress={onClose}
+      animationInTiming={240}
+      animationOutTiming={200}
+      backdropTransitionInTiming={240}
+      backdropTransitionOutTiming={200}
+      onModalHide={handleModalHide}
+      onBackdropPress={closeModal}
+      onBackButtonPress={closeModal}
+      onSwipeComplete={closeModal}
+      swipeDirection={['down']}
+      swipeThreshold={60}
       backdropOpacity={0.3}
-      // deviceHeight={deviceHeight}
-      // deviceWidth={deviceWidth}
-      // hasBackdrop={false}
-      // coverScreen={false}
-      // onSwipeComplete={onClose}
-      // swipeDirection={['down']}
-      // swipeThreshold={60}
+      propagateSwipe
       style={s.sheetWrapper}
     >
-      <View style={s.box}>
-        <View style={s.grabber} />
+      <Animated.View style={[s.box, { transform: [{ translateY: sheetTranslate }] }]}>
+        <View style={s.dragContainer} {...panResponder.panHandlers}>
+          <View style={s.grabber} />
           <View style={s.header}>
             <Text style={s.title}>{title ?? 'Overview'}</Text>
-            <TouchableOpacity onPress={onClose}><Text style={s.close}>×</Text></TouchableOpacity>
+            <TouchableOpacity
+              onPress={closeModal}
+              style={s.closeBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Overview schließen"
+              hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+            >
+              <Text style={s.closeBtnText}>✕</Text>
+            </TouchableOpacity>
           </View>
+        </View>
 
         <View style={s.filters}>
           <TouchableOpacity
@@ -161,13 +259,13 @@ function OverviewModalBase({
           </TouchableOpacity>
         </View>
  
-        <View style={{ height: 420}}>
+        <View style={{ height: 420 }}>
           {isContentVisible ? (
             <FlashList
               data={data}
               renderItem={renderItem}
               keyExtractor={(it) => it.key}
-              getItemType={(it) => it.type}
+              getItemType={getItemType}
               estimatedItemSize={44}
               extraData={extraVersion}
               removeClippedSubviews={false}
@@ -184,7 +282,7 @@ function OverviewModalBase({
             </View>
           ) : null}
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
@@ -211,6 +309,7 @@ const s = StyleSheet.create({
     fontWeight: '600',
     color: '#666',
   },
+  dragContainer: { paddingBottom: 4 },
   filters: {
     flexDirection: 'row',
     gap: 8,
@@ -240,7 +339,15 @@ const s = StyleSheet.create({
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
   title: { fontSize: 16, fontWeight: '700' },
-  close: { fontSize: 22, lineHeight: 22 },
+  closeBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: 'rgba(17,122,139,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: '#117a8b' },
 
   sectionHeader: {
     backgroundColor: '#f5f7f9',
