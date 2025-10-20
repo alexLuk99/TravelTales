@@ -80,9 +80,10 @@ function CountryModalBase({
             onPress={dismiss}
             accessibilityRole="button"
             accessibilityLabel="Close country details"
-            style={s.closeBtn}                 // <-- WICHTIG: style hinzufügen
+            style={s.closeBtn}
+            hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
           >
-            <Text style={s.close}>×</Text>
+            <Text style={s.closeBtnText}>✕</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -148,7 +149,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    paddingRight: 28, // Platz für Close-Button
+    paddingRight: 45, // Platz für Close-Button
   },
   centerTitleRow: {
     flexDirection: 'row',
@@ -170,10 +171,15 @@ const s = StyleSheet.create({
   closeBtn: {
     position: 'absolute',
     right: 0,
-    top: 0,
-    padding: 6,
+    top: 4,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(17,122,139,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  close: { fontSize: 26, lineHeight: 26, color: '#555' },
+  closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: '#117a8b' },
 
   // Action-Buttons
   actions: {

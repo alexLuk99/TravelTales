@@ -209,17 +209,17 @@ function OverviewModalBase({
     <Modal
       isVisible={visible}
       useNativeDriver={false}
-      useNativeDriverForBackdrop={true}
+      useNativeDriverForBackdrop={false}
       hideModalContentWhileAnimating ={true}
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      animationInTiming={240}
-      animationOutTiming={200}
-      backdropTransitionInTiming={240}
-      backdropTransitionOutTiming={200}
+      backdropTransitionOutTiming={1}
       onModalHide={handleModalHide}
       onBackdropPress={closeModal}
       onBackButtonPress={closeModal}
+      onSwipeComplete={closeModal}
+      swipeDirection={['down']}
+      swipeThreshold={80}
       backdropOpacity={0.3}
       propagateSwipe
       style={s.sheetWrapper}
