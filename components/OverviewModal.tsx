@@ -1,5 +1,14 @@
 import React, { memo, useMemo, useCallback, useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, InteractionManager, Animated, PanResponder } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  InteractionManager,
+  Animated,
+  PanResponder,
+} from 'react-native';
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
@@ -105,7 +114,7 @@ function OverviewModalBase({
   const panResponder = useMemo(
     () =>
       PanResponder.create({
-        onStartShouldSetPanResponder: () => false,
+        onStartShouldSetPanResponder: () => visible,
         onMoveShouldSetPanResponder: (_, gesture) =>
           visible && gesture.dy > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
         onPanResponderMove: (_, gesture) => {
@@ -199,8 +208,9 @@ function OverviewModalBase({
   return (
     <Modal
       isVisible={visible}
-      useNativeDriver
-      useNativeDriverForBackdrop={false}
+      useNativeDriver={false}
+      useNativeDriverForBackdrop={true}
+      hideModalContentWhileAnimating ={true}
       animationIn="slideInUp"
       animationOut="slideOutDown"
       animationInTiming={240}
@@ -210,23 +220,22 @@ function OverviewModalBase({
       onModalHide={handleModalHide}
       onBackdropPress={closeModal}
       onBackButtonPress={closeModal}
-      onSwipeComplete={closeModal}
-      swipeDirection={['down']}
-      swipeThreshold={60}
       backdropOpacity={0.3}
       propagateSwipe
       style={s.sheetWrapper}
     >
       <Animated.View style={[s.box, { transform: [{ translateY: sheetTranslate }] }]}>
-        <View style={s.dragContainer} {...panResponder.panHandlers}>
-          <View style={s.grabber} />
+        <View style={s.dragContainer}>
+          <View style={s.dragHandle} {...panResponder.panHandlers}>
+            <View style={s.grabber} />
+          </View>
           <View style={s.header}>
             <Text style={s.title}>{title ?? 'Overview'}</Text>
             <TouchableOpacity
               onPress={closeModal}
               style={s.closeBtn}
               accessibilityRole="button"
-              accessibilityLabel="Overview schließen"
+              accessibilityLabel="Close overview"
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
               <Text style={s.closeBtnText}>✕</Text>
@@ -310,6 +319,7 @@ const s = StyleSheet.create({
     color: '#666',
   },
   dragContainer: { paddingBottom: 4 },
+  dragHandle: { paddingVertical: 12, alignItems: 'center', justifyContent: 'center' },
   filters: {
     flexDirection: 'row',
     gap: 8,
