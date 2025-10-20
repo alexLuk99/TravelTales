@@ -62,7 +62,7 @@ function CountryModalBase({
       coverScreen={false}
       animationIn="slideInDown"
       animationOut="slideOutUp"
-      animationInTiming={220}
+      animationInTiming={200}
       animationOutTiming={500}
       backdropTransitionOutTiming={1}
       onModalHide={onHideComplete}
