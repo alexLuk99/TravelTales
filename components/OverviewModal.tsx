@@ -113,7 +113,6 @@ function OverviewModalBase({
       isVisible={visible}
       useNativeDriver
       useNativeDriverForBackdrop
-      hideModalContentWhileAnimating
       animationIn="slideInUp"
       animationOut="slideOutDown"
       animationInTiming={220}
@@ -124,7 +123,7 @@ function OverviewModalBase({
       onModalHide={() => setContentVisible(false)}
       // onBackdropPress={onClose}
       // onBackButtonPress={onClose}
-      // backdropOpacity={0.3}
+      backdropOpacity={0.3}
       // deviceHeight={deviceHeight}
       // deviceWidth={deviceWidth}
       // hasBackdrop={false}
@@ -180,7 +179,7 @@ function OverviewModalBase({
               getItemType={(it) => it.type}
               estimatedItemSize={44}
               extraData={extraVersion}
-              removeClippedSubviews
+              removeClippedSubviews={false}
               overrideItemLayout={(layout /*, item*/) => {
                 layout.size = 44; // deine Row: 28 (Checkbox) + 8+8 Padding = ~44
                 layout.span = 1;
