@@ -1,6 +1,6 @@
 import React, { useMemo, memo, useState } from 'react';
 import { Camera, FillLayer, LineLayer, LocationPuck, MapView, ShapeSource } from '@rnmapbox/maps';
-import countriesGeoJSON from '@/assets/data/countries-github.json';
+import countriesGeoJSON from '@/assets/data/countries-github-30.json';
 
 type ShapeSourcePressEvent = Parameters<NonNullable<React.ComponentProps<typeof ShapeSource>['onPress']>>[0];
 
