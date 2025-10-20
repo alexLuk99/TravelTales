@@ -42,6 +42,7 @@ export default function Map() {
             0.7
         ],
         fillOpacityTransition: { duration: 1000 },
+        fillSortKey: ['get', 'fillSortKey'],
     }), [visitedCountries]);
 
     const filterWorldView = useMemo(() => ([

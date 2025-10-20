@@ -1,6 +1,6 @@
 import React, { useMemo, memo, useState } from 'react';
 import { Camera, FillLayer, LineLayer, LocationPuck, MapView, ShapeSource } from '@rnmapbox/maps';
-import countriesGeoJSON from '@/assets/data/countries-github-30.json';
+import { COUNTRY_FEATURE_COLLECTION } from '@/components/data/countries';
 
 type ShapeSourcePressEvent = Parameters<NonNullable<React.ComponentProps<typeof ShapeSource>['onPress']>>[0];
 
@@ -8,6 +8,7 @@ type CountryProperties = {
   name?: string;
   iso_a2?: string;
   iso_a3?: string;
+  fillSortKey?: number;
 };
 
 const EMPTY_COUNTRY_SENTINEL = '__NONE__';
@@ -15,7 +16,10 @@ const ISO_ALPHA3_FIELD = 'iso_a3';
 const ISO_ALPHA2_FIELD = 'iso_a2';
 const NAME_FIELD = 'name';
 
-const featureCollection = countriesGeoJSON as GeoJSON.FeatureCollection<GeoJSON.Geometry, CountryProperties>;
+const featureCollection = COUNTRY_FEATURE_COLLECTION as GeoJSON.FeatureCollection<
+  GeoJSON.Geometry,
+  CountryProperties
+>;
 
 const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries }: any) => {
   const [loaded, setLoaded] = useState(false);
@@ -23,7 +27,8 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   const highlightLayerStyle = useMemo(() => ({
     fillColor: '#fbb03b',
     fillOpacity: isModalVisible ? 0.18 : 0,           
-    fillOpacityTransition: { duration: 160 },         
+    fillOpacityTransition: { duration: 160 },
+    fillSortKey: ['get', 'fillSortKey'],
   }), [isModalVisible]);
 
   const borderLayerStyle = useMemo(() => ({
@@ -32,16 +37,19 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     lineJoin: 'round',
     lineCap: 'round',
     lineWidth: ['interpolate', ['linear'], ['zoom'], 1, 0.5, 6, 1.6, 8, 2.2],
+    lineSortKey: ['get', 'fillSortKey'],
   }), [isModalVisible]);
 
   const wantLayerStyle = useMemo(() => ({
     fillColor: '#f4a261',
     fillOpacity: 0.7,
+    fillSortKey: ['get', 'fillSortKey'],
    }), []);
 
   const hitLayerStyle = useMemo(() => ({
     fillColor: '#000000',
     fillOpacity: 0,
+    fillSortKey: ['get', 'fillSortKey'],
   }), []);
 
   const wantFilter = useMemo(() => ([
@@ -55,11 +63,27 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   ]), [country]);
 
   const handleOnPress = (event: ShapeSourcePressEvent) => {
-    const feature = event.features?.[0];
-    const properties = feature?.properties as CountryProperties | undefined;
-    const alpha3 = properties?.[ISO_ALPHA3_FIELD];
-    const alpha2 = properties?.[ISO_ALPHA2_FIELD];
-    const name = properties?.[NAME_FIELD];
+    const features = event.features;
+    if (!features?.length) return;
+
+    let picked: CountryProperties | null = null;
+    let pickedSortKey = -Infinity;
+
+    for (const feature of features) {
+      const props = feature?.properties as CountryProperties | undefined;
+      if (!props) continue;
+      const sortKey = typeof props.fillSortKey === 'number' ? props.fillSortKey : 0;
+      if (!picked || sortKey > pickedSortKey) {
+        picked = props;
+        pickedSortKey = sortKey;
+      }
+    }
+
+    if (!picked) return;
+
+    const alpha3 = picked.iso_a3;
+    const alpha2 = picked.iso_a2;
+    const name = picked.name;
 
     if (alpha3 && alpha2 && name) {
       handleCountryClick(alpha3, name, alpha2);

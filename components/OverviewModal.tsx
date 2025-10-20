@@ -3,9 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-nati
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
-import { Country } from './data/countries';
-
-type Section = { title: string; data: Country[] };
+import type { Country, Section } from '@/components/data/countries';
 
 type Props = {
   visible: boolean;
