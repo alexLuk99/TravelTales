@@ -56,14 +56,15 @@ function CountryModalBase({
       onSwipeComplete={dismiss}
       swipeDirection={['up','down']}
       swipeThreshold={60}
-      useNativeDriver={true}
+      useNativeDriver={false}
+      hideModalContentWhileAnimating ={true}
       hasBackdrop={false}
       coverScreen={false}
       animationIn="slideInDown"
       animationOut="slideOutUp"
       animationInTiming={220}
       animationOutTiming={500}
-      backdropTransitionOutTiming={500}
+      backdropTransitionOutTiming={1}
       onModalHide={onHideComplete}
       style={s.sheetWrapper}
     >
