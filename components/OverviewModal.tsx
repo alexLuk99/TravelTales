@@ -115,14 +115,14 @@ function OverviewModalBase({
       useNativeDriverForBackdrop
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      animationInTiming={220}
-      animationOutTiming={180}
-      backdropTransitionInTiming={150}
-      backdropTransitionOutTiming={150}
+      // animationInTiming={220}
+      // animationOutTiming={180}
+      // backdropTransitionInTiming={150}
+      // backdropTransitionOutTiming={150}
       onModalShow={() => setContentVisible(true)}
       onModalHide={() => setContentVisible(false)}
-      // onBackdropPress={onClose}
-      // onBackButtonPress={onClose}
+      onBackdropPress={onClose}
+      onBackButtonPress={onClose}
       backdropOpacity={0.3}
       // deviceHeight={deviceHeight}
       // deviceWidth={deviceWidth}
