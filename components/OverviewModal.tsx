@@ -1,5 +1,5 @@
 import React, { memo, useMemo, useCallback, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
@@ -111,21 +111,20 @@ function OverviewModalBase({
   return (
     <Modal
       isVisible={visible}
-      backdropTransitionOutTiming={1}
+      useNativeDriver
+      useNativeDriverForBackdrop
+      hideModalContentWhileAnimating
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      animationInTiming={220}
+      animationOutTiming={180}
+      backdropTransitionInTiming={150}
+      backdropTransitionOutTiming={150}
+      onModalShow={() => setContentVisible(true)}
+      onModalHide={() => setContentVisible(false)}
       // onBackdropPress={onClose}
       // onBackButtonPress={onClose}
       // backdropOpacity={0.3}
-      // useNativeDriver={true}
-      // useNativeDriverForBackdrop={true}
-      // onModalShow={() => setContentVisible(true)}
-      // onModalHide={() => setContentVisible(false)}
-      // hideModalContentWhileAnimating
-      // animationIn="slideInUp"
-      // animationOut="slideOutDown"
-      // animationInTiming={200}
-      // animationOutTiming={200}
-      // backdropTransitionInTiming={0}
-      // backdropTransitionOutTiming={0}
       // deviceHeight={deviceHeight}
       // deviceWidth={deviceWidth}
       // hasBackdrop={false}
@@ -173,25 +172,31 @@ function OverviewModalBase({
         // </View> */}
  
         <View style={{ height: 420}}>
-          <FlashList
-            data={data}
-            renderItem={renderItem}
-            keyExtractor={(it) => it.key}
-            getItemType={(it) => it.type}
-            estimatedItemSize={44}
-            removeClippedSubviews={false}
-            extraData={extraVersion}
-            overrideItemLayout={(layout /*, item*/) => {
-              layout.size = 44; // deine Row: 28 (Checkbox) + 8+8 Padding = ~44
-              layout.span = 1;
-            }}
-            stickyHeaderIndices={stickyHeaderIndices}
-            drawDistance={800}
-            // showsVerticalScrollIndicator
-            // contentContainerStyle={{ paddingBottom: 16 }}
-            // ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
-            // extraData={extraVersion} 
-          />
+          {isContentVisible ? (
+            <FlashList
+              data={data}
+              renderItem={renderItem}
+              keyExtractor={(it) => it.key}
+              getItemType={(it) => it.type}
+              estimatedItemSize={44}
+              extraData={extraVersion}
+              removeClippedSubviews
+              overrideItemLayout={(layout /*, item*/) => {
+                layout.size = 44; // deine Row: 28 (Checkbox) + 8+8 Padding = ~44
+                layout.span = 1;
+              }}
+              stickyHeaderIndices={stickyHeaderIndices}
+              drawDistance={800}
+              // showsVerticalScrollIndicator
+              // contentContainerStyle={{ paddingBottom: 16 }}
+              // ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
+              // extraData={extraVersion} 
+            />
+          ) : visible ? (
+            <View style={s.loader}>
+              <ActivityIndicator color="#3bb2d0" size="small" />
+            </View>
+          ) : null}
         </View>
       </View>
     </Modal>
@@ -260,4 +265,9 @@ const s = StyleSheet.create({
     marginBottom: 4,
   },
   sectionTitle: { fontSize: 13, fontWeight: '700', color: '#333' },
+  loader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
