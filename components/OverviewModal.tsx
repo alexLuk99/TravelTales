@@ -115,10 +115,6 @@ function OverviewModalBase({
       useNativeDriverForBackdrop
       animationIn="slideInUp"
       animationOut="slideOutDown"
-      // animationInTiming={220}
-      // animationOutTiming={180}
-      // backdropTransitionInTiming={150}
-      // backdropTransitionOutTiming={150}
       onModalShow={() => setContentVisible(true)}
       onModalHide={() => setContentVisible(false)}
       onBackdropPress={onClose}
@@ -164,11 +160,6 @@ function OverviewModalBase({
             </Text>
           </TouchableOpacity>
         </View>
-
-        {/* {/* <View style={s.columnHeaderRow}>
-          <Text style={[s.columnHeader, { marginLeft: 0 }]}>Visited</Text>
-          <Text style={[s.columnHeader, { marginLeft: 0 }]}>Wishlist</Text>
-        // </View> */}
  
         <View style={{ height: 420}}>
           {isContentVisible ? (
@@ -186,10 +177,6 @@ function OverviewModalBase({
               }}
               stickyHeaderIndices={stickyHeaderIndices}
               drawDistance={800}
-              // showsVerticalScrollIndicator
-              // contentContainerStyle={{ paddingBottom: 16 }}
-              // ListEmptyComponent={<Text style={{ padding: 12 }}>Keine Einträge gefunden.</Text>}
-              // extraData={extraVersion} 
             />
           ) : visible ? (
             <View style={s.loader}>
