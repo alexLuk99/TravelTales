@@ -13,6 +13,7 @@ import Modal from 'react-native-modal';
 import { FlashList, type ListRenderItemInfo } from '@shopify/flash-list';
 import CountryRow from './CountryRow';
 import type { Country, Section } from '@/components/data/countries';
+import { AlphaPalette, Palette } from '@/constants/Colors';
 
 type Props = {
   visible: boolean;
@@ -287,7 +288,7 @@ function OverviewModalBase({
             />
           ) : visible ? (
             <View style={s.loader}>
-              <ActivityIndicator color="#3bb2d0" size="small" />
+              <ActivityIndicator color={Palette.horizonBlue} size="small" />
             </View>
           ) : null}
         </View>
@@ -301,7 +302,7 @@ export default memo(OverviewModalBase);
 const s = StyleSheet.create({
   sheetWrapper: { justifyContent: 'flex-end', margin: 0, paddingHorizontal: 8 },
   box: {
-    backgroundColor: 'white',
+    backgroundColor: Palette.white,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -316,7 +317,7 @@ const s = StyleSheet.create({
   columnHeader: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: Palette.slateMuted,
   },
   dragContainer: { paddingBottom: 4 },
   dragHandle: { paddingVertical: 12, alignItems: 'center', justifyContent: 'center' },
@@ -330,44 +331,44 @@ const s = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: Palette.softBorder,
+    backgroundColor: Palette.white,
   },
   filterBtnOn: {
-    borderColor: '#3bb2d0',
-    backgroundColor: 'rgba(59,178,208,0.10)',
+    borderColor: Palette.horizonBlue,
+    backgroundColor: AlphaPalette.overlaySky,
   },
-  filterText: { fontSize: 13, color: '#333', fontWeight: '600' },
-  filterTextOn: { color: '#117a8b' },
+  filterText: { fontSize: 13, color: Palette.slate, fontWeight: '600' },
+  filterTextOn: { color: Palette.horizonBlue },
   grabber: {
     alignSelf: 'center',
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: Palette.softBorder,
     marginBottom: 8,
   },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  title: { fontSize: 16, fontWeight: '700' },
+  title: { fontSize: 16, fontWeight: '700', color: Palette.slate },
   closeBtn: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: 'rgba(17,122,139,0.12)',
+    backgroundColor: AlphaPalette.overlaySky,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: '#117a8b' },
+  closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: Palette.horizonBlue },
 
   sectionHeader: {
-    backgroundColor: '#f5f7f9',
+    backgroundColor: Palette.cloudWhite,
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 6,
     marginTop: 0,
     marginBottom: 4,
   },
-  sectionTitle: { fontSize: 13, fontWeight: '700', color: '#333' },
+  sectionTitle: { fontSize: 13, fontWeight: '700', color: Palette.slate },
   loader: {
     flex: 1,
     alignItems: 'center',

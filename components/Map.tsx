@@ -11,6 +11,7 @@ import OverviewModal from './OverviewModal';
 import { COUNTRY_SECTIONS  } from '@/components/data/countries';
 import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
 import Coachmark from './Coachmark';
+import { Palette } from '@/constants/Colors';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 const SEEN_COACHMARK_KEY = 'seenCoachmarkV1';
@@ -34,7 +35,7 @@ export default function Map() {
     }, []);
 
     const fillLayerStyle = useMemo(() => ({
-        fillColor: '#3bb2d0',
+        fillColor: Palette.skyBlue,
         fillOpacity: [
             'case',
             ['in', ['get', 'iso_a3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],

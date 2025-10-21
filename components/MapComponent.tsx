@@ -5,6 +5,7 @@ import type { LocationObject } from 'expo-location';
 import { Animated, Pressable, StyleSheet, View } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COUNTRY_FEATURE_COLLECTION } from '@/components/data/countries';
+import { AlphaPalette, Palette } from '@/constants/Colors';
 
 type ShapeSourcePressEvent = Parameters<NonNullable<React.ComponentProps<typeof ShapeSource>['onPress']>>[0];
 
@@ -55,14 +56,14 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     : null;
 
   const highlightLayerStyle = useMemo(() => ({
-    fillColor: '#fbb03b',
+    fillColor: Palette.sunYellow,
     fillOpacity: isModalVisible ? 0.18 : 0,           
     fillOpacityTransition: { duration: 160 },
     fillSortKey: ['get', 'fillSortKey'],
   }), [isModalVisible]);
 
   const borderLayerStyle = useMemo(() => ({
-    lineColor: '#1f2937',
+    lineColor: Palette.brandNavy,
     lineOpacity: isModalVisible ? 1 : 0,
     lineJoin: 'round',
     lineCap: 'round',
@@ -71,13 +72,13 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   }), [isModalVisible]);
 
   const wantLayerStyle = useMemo(() => ({
-    fillColor: '#f4a261',
-    fillOpacity: 0.7,
+    fillColor: Palette.sunsetOrange,
+    fillOpacity: 0.6,
     fillSortKey: ['get', 'fillSortKey'],
    }), []);
 
   const hitLayerStyle = useMemo(() => ({
-    fillColor: '#000000',
+    fillColor: Palette.brandNavy,
     fillOpacity: 0,
     fillSortKey: ['get', 'fillSortKey'],
   }), []);
@@ -312,7 +313,7 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
           <MaterialIcons
             name={isFollowingUser ? 'my-location' : 'location-searching'}
             size={22}
-            color={isFollowingUser ? 'rgba(31,41,55,0.55)' : 'rgba(37,99,235,0.95)'}
+            color={isFollowingUser ? Palette.slateMuted : Palette.horizonBlue}
           />
         </Animated.View>
       </Pressable>
@@ -327,11 +328,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 16,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: AlphaPalette.overlayWhite,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 20,
-    shadowColor: '#000000',
+    shadowColor: Palette.shadow,
     shadowOpacity: 0.2,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 2 },

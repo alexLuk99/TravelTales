@@ -1,6 +1,8 @@
 import React, { memo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
+import { AlphaPalette, Palette } from "@/constants/Colors";
+
 type Country = {
   name_en: string;
   iso_3166_1_alpha_3: string;
@@ -67,14 +69,14 @@ export default memo(
 const s = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", paddingVertical: 8, gap: 8 },
   flag: { width: 28, textAlign: "center", fontSize: 18 },
-  name: { flex: 1, fontSize: 14, color: "#111" },
+  name: { flex: 1, fontSize: 14, color: Palette.slate },
   checkbox: {
-    width: 28, height: 28, borderWidth: 1, borderColor: "#ccc",
+    width: 28, height: 28, borderWidth: 1, borderColor: Palette.softBorder,
     alignItems: "center", justifyContent: "center",
     borderRadius: 6, marginLeft: 6,
   },
-  checkboxOn: { borderColor: "#3bb2d0", backgroundColor: "rgba(59,178,208,0.15)" },
-  checkboxWish: { borderColor: "#f4a261", backgroundColor: "rgba(244,162,97,0.12)" },
-  checkboxText: { fontSize: 16, color: "#3bb2d0" },
-  checkboxWishText: { fontSize: 16, color: "#f4a261" },
+  checkboxOn: { borderColor: Palette.horizonBlue, backgroundColor: AlphaPalette.overlaySky },
+  checkboxWish: { borderColor: Palette.sunsetOrange, backgroundColor: AlphaPalette.overlaySun },
+  checkboxText: { fontSize: 16, color: Palette.horizonBlue },
+  checkboxWishText: { fontSize: 16, color: Palette.sunsetOrange },
 });

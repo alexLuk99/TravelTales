@@ -2,6 +2,8 @@ import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, type TextStyle } from 'react-native';
 import Modal from 'react-native-modal';
 
+import { AlphaPalette, Palette } from '@/constants/Colors';
+
 type Country = {
   name_en: string;
   code: string;         // ISO3
@@ -142,10 +144,10 @@ const s = StyleSheet.create({
   },
   box: {
     width: '96%',
-    backgroundColor: 'white',
+    backgroundColor: Palette.white,
     borderRadius: 12,
     padding: 10,
-    shadowColor: '#000',
+    shadowColor: Palette.shadow,
     shadowOpacity: 0.10,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
@@ -170,7 +172,7 @@ const s = StyleSheet.create({
   title: {
     fontSize: 19,
     fontWeight: '700',
-    color: '#111',
+    color: Palette.slate,
     textAlign: 'center',
     flexShrink: 1,
   },
@@ -183,7 +185,7 @@ const s = StyleSheet.create({
     width: 35,
     height: 35,
     borderRadius: 20,
-    backgroundColor: 'rgba(17,122,139,0.12)',
+    backgroundColor: AlphaPalette.overlaySky,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -193,7 +195,7 @@ const s = StyleSheet.create({
     height: 36,
     borderRadius: 18,
   },
-  closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: '#117a8b' },
+  closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: Palette.horizonBlue },
 
   // Action-Buttons
   actions: {
@@ -215,8 +217,8 @@ const s = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#d6d6d6',
-    backgroundColor: '#fff',
+    borderColor: Palette.softBorder,
+    backgroundColor: Palette.white,
     minWidth: 136,
   },
   actionBtnCompact: {
@@ -228,45 +230,45 @@ const s = StyleSheet.create({
     width: 26,
     height: 26,
     borderRadius: 13,
-    backgroundColor: 'rgba(17,122,139,0.12)',
+    backgroundColor: AlphaPalette.overlaySky,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionIconWrapVisited: {
-    backgroundColor: 'rgba(17,122,139,0.24)',
+    backgroundColor: AlphaPalette.overlaySkyStrong,
   },
   actionIconWrapWish: {
-    backgroundColor: 'rgba(244,162,97,0.16)',
+    backgroundColor: AlphaPalette.overlaySunSoft,
   },
   actionIconWrapWishOn: {
-    backgroundColor: 'rgba(244,162,97,0.28)',
+    backgroundColor: AlphaPalette.overlaySunStrong,
   },
   actionIcon: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#117a8b',
+    color: Palette.horizonBlue,
     lineHeight: 18,
     textAlign: 'center',
     textAlignVertical: 'center',
     includeFontPadding: false,
   } as TextStyle,
-  actionIconOn: { color: '#0a3d47' },
-  actionIconWish: { color: '#ba611f' },
-  actionIconWishOn: { color: '#79320b' },
-  actionText: { fontSize: 14, fontWeight: '700', color: '#303030' },
+  actionIconOn: { color: Palette.brandNavy },
+  actionIconWish: { color: Palette.sunsetOrange },
+  actionIconWishOn: { color: Palette.brandNavy },
+  actionText: { fontSize: 14, fontWeight: '700', color: Palette.slate },
 
   // Visited-State (blau)
-  visitedText: { color: '#0f5f6d' },
+  visitedText: { color: Palette.horizonBlue },
   actionOnVisited: {
-    borderColor: '#117a8b',
-    backgroundColor: 'rgba(17,122,139,0.12)',
+    borderColor: Palette.horizonBlue,
+    backgroundColor: AlphaPalette.overlaySky,
   },
 
   // Wishlist-State (orange)
-  wishText: { color: '#8d4a1b' },
+  wishText: { color: Palette.sunsetOrange },
   actionOnWish: {
-    borderColor: '#f4a261',
-    backgroundColor: 'rgba(244,162,97,0.14)',
+    borderColor: Palette.sunsetOrange,
+    backgroundColor: AlphaPalette.overlaySun,
   },
 
   // Grabber ganz unten
@@ -275,7 +277,7 @@ const s = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: Palette.softBorder,
     marginTop: 8,
   },
 });

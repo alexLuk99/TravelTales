@@ -1,26 +1,59 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
+const brandNavy = '#123a7a';
+const horizonBlue = '#2f6dbe';
+const skyBlue = '#64a3ff';
+const sunYellow = '#ffd447';
+const sunsetOrange = '#ff9f45';
+const sand = '#f7e8c9';
+const cloudWhite = '#f9fbff';
+const slate = '#2b4b7a';
+const slateMuted = '#6a7da6';
+const midnight = '#102146';
+const midnightMuted = '#1c3155';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+export const Palette = {
+  brandNavy,
+  brandNavyDark: '#0c2758',
+  horizonBlue,
+  skyBlue,
+  sunYellow,
+  sunsetOrange,
+  sand,
+  cloudWhite,
+  white: '#ffffff',
+  slate,
+  slateMuted,
+  midnight,
+  midnightMuted,
+  shadow: 'rgba(15,30,57,0.16)',
+  softBorder: '#dbe4f5',
+};
+
+export const AlphaPalette = {
+  overlayNavy: 'rgba(18,58,122,0.14)',
+  overlaySky: 'rgba(47,109,190,0.18)',
+  overlaySkyStrong: 'rgba(47,109,190,0.32)',
+  overlaySun: 'rgba(255,159,69,0.28)',
+  overlaySunSoft: 'rgba(255,159,69,0.2)',
+  overlaySunStrong: 'rgba(255,159,69,0.38)',
+  overlaySand: 'rgba(247,232,201,0.68)',
+  overlayWhite: 'rgba(255,255,255,0.92)',
+};
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    text: slate,
+    background: cloudWhite,
+    tint: sunYellow,
+    icon: slateMuted,
+    tabIconDefault: slateMuted,
+    tabIconSelected: sunYellow,
   },
   dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    text: '#f5f7ff',
+    background: midnight,
+    tint: sunYellow,
+    icon: '#a8bce6',
+    tabIconDefault: '#7d93c5',
+    tabIconSelected: sunYellow,
   },
 };

@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, Animated } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { AlphaPalette, Palette } from '@/constants/Colors';
+
 type Props = {
   visible: boolean;
   text: string;
@@ -56,7 +58,7 @@ export default function Coachmark({
       <Animated.View style={[s.scrim, { opacity }]} pointerEvents="none" />
       <Animated.View style={[s.bubble, { opacity, transform: [{ translateY }, { scale }] }]}>
         <View style={s.iconBadge}>
-          <MaterialCommunityIcons name="airplane-takeoff" size={26} color="#0f4c81" />
+          <MaterialCommunityIcons name="airplane-takeoff" size={26} color={Palette.sunsetOrange} />
         </View>
         <Text style={s.title}>{heading}</Text>
         <Text style={s.text}>{text}</Text>
@@ -84,28 +86,28 @@ const s = StyleSheet.create({
   },
   scrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(10,49,97,0.25)',
+    backgroundColor: AlphaPalette.overlayNavy,
   },
   bubble: {
     maxWidth: '90%',
-    backgroundColor: '#f8fbff',
+    backgroundColor: Palette.cloudWhite,
     paddingVertical: 18,
     paddingHorizontal: 20,
     borderRadius: 16,
     elevation: 5,
-    shadowColor: '#0a3161',
+    shadowColor: Palette.shadow,
     shadowOpacity: 0.18,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(15,76,129,0.08)',
+    borderColor: Palette.softBorder,
   },
   iconBadge: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: 'rgba(15,76,129,0.12)',
+    backgroundColor: AlphaPalette.overlaySky,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 8,
@@ -113,14 +115,14 @@ const s = StyleSheet.create({
   title: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#0f4c81',
+    color: Palette.brandNavy,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
     marginBottom: 6,
   },
   text: {
     fontSize: 13,
-    color: '#1f2937',
+    color: Palette.slate,
     textAlign: 'center',
     lineHeight: 19,
   },
@@ -129,8 +131,8 @@ const s = StyleSheet.create({
     paddingHorizontal: 22,
     paddingVertical: 9,
     borderRadius: 999,
-    backgroundColor: '#0f4c81',
-    shadowColor: '#0a3161',
+    backgroundColor: Palette.sunsetOrange,
+    shadowColor: Palette.shadow,
     shadowOpacity: 0.16,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
@@ -138,7 +140,7 @@ const s = StyleSheet.create({
   },
   cta: {
     fontSize: 12,
-    color: '#f8fbff',
+    color: Palette.white,
     fontWeight: '700',
     letterSpacing: 0.4,
     textTransform: 'uppercase',
@@ -153,6 +155,6 @@ const s = StyleSheet.create({
     borderTopWidth: 14,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
-    borderTopColor: '#f8fbff',
+    borderTopColor: Palette.cloudWhite,
   },
 });
