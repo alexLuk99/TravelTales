@@ -138,7 +138,9 @@ export default function Map() {
             <Coachmark
                 visible={showCoachmark}
                 onDismiss={dismissCoachmark}
-                text="Tap on a country to mark it as Visited or add it to your Wishlist."
+                title="Welcome aboard"
+                text="Tap a country to capture places you've visited or earmark dream destinations for your wishlist."
+                ctaLabel="Start exploring"
             />
             <CountryModal
                 isVisible={isModalVisible}
