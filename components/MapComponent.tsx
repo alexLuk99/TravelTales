@@ -25,7 +25,8 @@ const featureCollection = COUNTRY_FEATURE_COLLECTION as GeoJSON.FeatureCollectio
   CountryProperties
 >;
 
-const QUICK_CENTER_ANIMATION_MS = 750;
+const QUICK_CENTER_ANIMATION_MS = 120;
+const NORTH_REALIGN_DURATION_MS = 120;
 const LOCATION_SNAP_DELTA = 0.00045;
 
 type MapComponentProps = {
@@ -45,8 +46,10 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   const [isFollowingUser, setIsFollowingUser] = useState(true);
   const [cameraTriggerKey, setCameraTriggerKey] = useState(0);
   const cameraRef = useRef<MapboxCameraRef>(null);
+  const headingResetTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iconOpacity = useRef(new Animated.Value(1)).current;
   const iconScale = useRef(new Animated.Value(0.95)).current;
+  const lastCenteredKeyRef = useRef<string | null>(null);
   const userCoords = location?.coords
     ? ([location.coords.longitude, location.coords.latitude] as [number, number])
     : null;
@@ -117,32 +120,83 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     }
   };
 
+  const queueCenterOnUser = useCallback(() => {
+    if (headingResetTimeout.current) {
+      clearTimeout(headingResetTimeout.current);
+      headingResetTimeout.current = null;
+    }
+
+    const camera = cameraRef.current;
+    if (!camera) return;
+
+    const stopFn = (camera as any)?.stop;
+    if (typeof stopFn === 'function') {
+      stopFn();
+    }
+
+    if (!userCoords) {
+      camera.setCamera({
+        heading: 0,
+        pitch: 0,
+        animationDuration: NORTH_REALIGN_DURATION_MS,
+        animationMode: 'easeTo',
+      });
+      lastCenteredKeyRef.current = null;
+      return;
+    }
+
+    const key = `${userCoords[0].toFixed(5)}:${userCoords[1].toFixed(5)}`;
+
+    camera.setCamera({
+      centerCoordinate: userCoords,
+      zoomLevel: 0.9,
+      animationDuration: QUICK_CENTER_ANIMATION_MS,
+      animationMode: 'easeTo',
+    });
+
+    lastCenteredKeyRef.current = key;
+
+    headingResetTimeout.current = setTimeout(() => {
+      const currentCamera = cameraRef.current;
+      if (!currentCamera) return;
+
+      const followStop = (currentCamera as any)?.stop;
+      if (typeof followStop === 'function') {
+        followStop();
+      }
+
+      currentCamera.setCamera({
+        heading: 0,
+        pitch: 0,
+        animationDuration: NORTH_REALIGN_DURATION_MS,
+        animationMode: 'easeTo',
+      });
+
+      headingResetTimeout.current = null;
+    }, QUICK_CENTER_ANIMATION_MS + 20);
+  }, [userCoords]);
+
   const handleFollowUser = useCallback(() => {
-    if (cameraRef.current) {
-      const stopFn = (cameraRef.current as any)?.stop;
+    if (headingResetTimeout.current) {
+      clearTimeout(headingResetTimeout.current);
+      headingResetTimeout.current = null;
+    }
+
+    const camera = cameraRef.current;
+    if (camera) {
+      const stopFn = (camera as any)?.stop;
       if (typeof stopFn === 'function') {
         stopFn();
       }
 
-      const targetStop = userCoords
-        ? {
-            centerCoordinate: userCoords,
-            zoomLevel: 0.9,
-            animationDuration: QUICK_CENTER_ANIMATION_MS,
-            animationMode: 'easeTo' as const,
-          }
-        : {
-            zoomLevel: 0.9,
-            animationDuration: QUICK_CENTER_ANIMATION_MS,
-            animationMode: 'easeTo' as const,
-          };
-
-      cameraRef.current.setCamera(targetStop);
+      lastCenteredKeyRef.current = null;
     }
+
+    queueCenterOnUser();
 
     setIsFollowingUser(true);
     setCameraTriggerKey(key => key + 1);
-  }, [userCoords]);
+  }, [queueCenterOnUser]);
 
   useEffect(() => {
     Animated.parallel([
@@ -160,12 +214,34 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     ]).start();
   }, [iconOpacity, iconScale, isFollowingUser]);
 
+  useEffect(() => {
+    if (!userCoords || !isFollowingUser) return;
+
+    const key = `${userCoords[0].toFixed(5)}:${userCoords[1].toFixed(5)}`;
+    if (lastCenteredKeyRef.current === key) return;
+
+    queueCenterOnUser();
+  }, [userCoords, isFollowingUser, queueCenterOnUser]);
+
+  useEffect(() => () => {
+    if (headingResetTimeout.current) {
+      clearTimeout(headingResetTimeout.current);
+      headingResetTimeout.current = null;
+    }
+    lastCenteredKeyRef.current = null;
+  }, []);
+
   const handleCameraChanged = useCallback(
     (state: MapState) => {
       const gestureActive = Boolean(state?.gestures?.isGestureActive);
       if (gestureActive) {
         if (isFollowingUser) {
           setIsFollowingUser(false);
+        }
+        lastCenteredKeyRef.current = null;
+        if (headingResetTimeout.current) {
+          clearTimeout(headingResetTimeout.current);
+          headingResetTimeout.current = null;
         }
         return;
       }
@@ -180,10 +256,12 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
 
       const delta = Math.hypot(lon - userCoords[0], lat - userCoords[1]);
       if (delta <= LOCATION_SNAP_DELTA) {
+        queueCenterOnUser();
         setIsFollowingUser(true);
+        setCameraTriggerKey(key => key + 1);
       }
     },
-    [isFollowingUser, userCoords],
+    [isFollowingUser, queueCenterOnUser, userCoords],
   );
 
   return (
