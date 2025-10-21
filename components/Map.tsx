@@ -133,6 +133,7 @@ export default function Map() {
                 country={selectedCountry}
                 isModalVisible={isModalVisible}
                 hideCloseButton={true}
+                location={location}
             />
             <Coachmark
                 visible={showCoachmark}

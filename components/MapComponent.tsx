@@ -1,5 +1,8 @@
-import React, { useMemo, memo, useState } from 'react';
+import React, { useMemo, memo, useState, useCallback, useRef } from 'react';
 import { Camera, FillLayer, LineLayer, LocationPuck, MapView, ShapeSource } from '@rnmapbox/maps';
+import type { Camera as MapboxCameraRef, MapState } from '@rnmapbox/maps';
+import type { LocationObject } from 'expo-location';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { COUNTRY_FEATURE_COLLECTION } from '@/components/data/countries';
 
 type ShapeSourcePressEvent = Parameters<NonNullable<React.ComponentProps<typeof ShapeSource>['onPress']>>[0];
@@ -21,8 +24,26 @@ const featureCollection = COUNTRY_FEATURE_COLLECTION as GeoJSON.FeatureCollectio
   CountryProperties
 >;
 
-const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries }: any) => {
+type MapComponentProps = {
+  handleCountryClick: (alpha3: string, name: string, alpha2: string) => void;
+  fillLayerStyle: any;
+  filterWorldView: any;
+  country: { code: string } | null;
+  isModalVisible: boolean;
+  wantToVisitCountries: string[];
+  visitedCountries?: string[];
+  location: LocationObject | null;
+  hideCloseButton?: boolean;
+};
+
+const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries, location }: MapComponentProps) => {
   const [loaded, setLoaded] = useState(false);
+  const [isFollowingUser, setIsFollowingUser] = useState(true);
+  const [cameraTriggerKey, setCameraTriggerKey] = useState(0);
+  const cameraRef = useRef<MapboxCameraRef>(null);
+  const userCoords = location?.coords
+    ? ([location.coords.longitude, location.coords.latitude] as [number, number])
+    : null;
 
   const highlightLayerStyle = useMemo(() => ({
     fillColor: '#fbb03b',
@@ -90,32 +111,107 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     }
   };
 
+  const handleFollowUser = useCallback(() => {
+    if (cameraRef.current) {
+      const targetStop = userCoords
+        ? {
+            centerCoordinate: userCoords,
+            zoomLevel: 0.9,
+            animationDuration: 750,
+            animationMode: 'flyTo' as const,
+          }
+        : {
+            zoomLevel: 0.9,
+            animationDuration: 750,
+            animationMode: 'flyTo' as const,
+          };
+
+      cameraRef.current.setCamera(targetStop);
+    }
+
+    setIsFollowingUser(true);
+    setCameraTriggerKey(key => key + 1);
+  }, [userCoords]);
+
+  const handleCameraChanged = useCallback(
+    (state: MapState) => {
+      if (!isFollowingUser) return;
+      if (state?.gestures?.isGestureActive) {
+        setIsFollowingUser(false);
+      }
+    },
+    [isFollowingUser],
+  );
+
   return (
-    <MapView
-      style={{ flex: 1 }}
-      styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc"
-      projection="globe"
-      scaleBarEnabled={false}
-      preferredFramesPerSecond={60}
-      compassEnabled={true}
-      compassFadeWhenNorth={loaded}
-      compassPosition={{  top: 200, right: 5 }}
-      zoomEnabled={true}
-      logoEnabled={false}
-      attributionPosition={{ bottom: 5, left: 5 }}
-      onDidFinishLoadingMap={() => setLoaded(true)}
-    >
-      <ShapeSource id="countries-shape-source" shape={featureCollection} onPress={handleOnPress}>
-        <FillLayer id="countries-base-layer" sourceID="countries-shape-source" style={fillLayerStyle} filter={filterWorldView} />
-        <FillLayer id="countries-wishlist-layer" sourceID="countries-shape-source" style={wantLayerStyle} filter={wantFilter} />
-        <FillLayer id="countries-hit-layer" sourceID="countries-shape-source" style={hitLayerStyle} />
-        <FillLayer id="countries-highlight-layer" sourceID="countries-shape-source" style={highlightLayerStyle} filter={highlightFilter} />
-        <LineLayer id="countries-highlight-border" sourceID="countries-shape-source" style={borderLayerStyle} filter={highlightFilter} />
-      </ShapeSource>
-      <Camera followZoomLevel={0.9} followUserLocation />
-      <LocationPuck pulsing={{ isEnabled: true }} />
-    </MapView>
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        styleURL="mapbox://styles/alexluk/cm4r3x4s100a401r13dfy9puc"
+        projection="globe"
+        scaleBarEnabled={false}
+        preferredFramesPerSecond={60}
+        compassEnabled={true}
+        compassFadeWhenNorth={loaded}
+        compassPosition={{ top: 200, right: 5 }}
+        zoomEnabled={true}
+        logoEnabled={false}
+        attributionPosition={{ bottom: 5, left: 5 }}
+        onDidFinishLoadingMap={() => setLoaded(true)}
+        onCameraChanged={handleCameraChanged}
+      >
+        <ShapeSource id="countries-shape-source" shape={featureCollection} onPress={handleOnPress}>
+          <FillLayer id="countries-base-layer" sourceID="countries-shape-source" style={fillLayerStyle} filter={filterWorldView} />
+          <FillLayer id="countries-wishlist-layer" sourceID="countries-shape-source" style={wantLayerStyle} filter={wantFilter} />
+          <FillLayer id="countries-hit-layer" sourceID="countries-shape-source" style={hitLayerStyle} />
+          <FillLayer id="countries-highlight-layer" sourceID="countries-shape-source" style={highlightLayerStyle} filter={highlightFilter} />
+          <LineLayer id="countries-highlight-border" sourceID="countries-shape-source" style={borderLayerStyle} filter={highlightFilter} />
+        </ShapeSource>
+        <Camera
+          ref={cameraRef}
+          followZoomLevel={isFollowingUser ? 0.9 : undefined}
+          followUserLocation={isFollowingUser}
+          animationMode="flyTo"
+          triggerKey={cameraTriggerKey}
+          animationDuration={750}
+        />
+        <LocationPuck pulsing={{ isEnabled: true }} />
+      </MapView>
+      <Pressable
+        onPress={handleFollowUser}
+        accessibilityRole="button"
+        accessibilityLabel="Kamera folgt wieder meinem Standort"
+        hitSlop={10}
+        style={({ pressed }) => [
+          styles.followButton,
+          pressed && styles.followButtonPressed,
+        ]}
+      >
+        <Text style={styles.followButtonText}>Mein Standort</Text>
+      </Pressable>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  map: { flex: 1 },
+  followButton: {
+    position: 'absolute',
+    bottom: 24,
+    right: 16,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: '#000000',
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  followButtonPressed: { opacity: 0.85 },
+  followButtonText: { color: '#1f2937', fontWeight: '600' },
+});
 
 export default memo(MapComponent);
