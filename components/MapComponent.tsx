@@ -1,8 +1,9 @@
-import React, { useMemo, memo, useState, useCallback, useRef } from 'react';
+import React, { useMemo, memo, useState, useCallback, useRef, useEffect } from 'react';
 import { Camera, FillLayer, LineLayer, LocationPuck, MapView, ShapeSource } from '@rnmapbox/maps';
 import type { Camera as MapboxCameraRef, MapState } from '@rnmapbox/maps';
 import type { LocationObject } from 'expo-location';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, View } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { COUNTRY_FEATURE_COLLECTION } from '@/components/data/countries';
 
 type ShapeSourcePressEvent = Parameters<NonNullable<React.ComponentProps<typeof ShapeSource>['onPress']>>[0];
@@ -24,6 +25,9 @@ const featureCollection = COUNTRY_FEATURE_COLLECTION as GeoJSON.FeatureCollectio
   CountryProperties
 >;
 
+const QUICK_CENTER_ANIMATION_MS = 750;
+const LOCATION_SNAP_DELTA = 0.00045;
+
 type MapComponentProps = {
   handleCountryClick: (alpha3: string, name: string, alpha2: string) => void;
   fillLayerStyle: any;
@@ -41,6 +45,8 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
   const [isFollowingUser, setIsFollowingUser] = useState(true);
   const [cameraTriggerKey, setCameraTriggerKey] = useState(0);
   const cameraRef = useRef<MapboxCameraRef>(null);
+  const iconOpacity = useRef(new Animated.Value(1)).current;
+  const iconScale = useRef(new Animated.Value(0.95)).current;
   const userCoords = location?.coords
     ? ([location.coords.longitude, location.coords.latitude] as [number, number])
     : null;
@@ -113,17 +119,22 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
 
   const handleFollowUser = useCallback(() => {
     if (cameraRef.current) {
+      const stopFn = (cameraRef.current as any)?.stop;
+      if (typeof stopFn === 'function') {
+        stopFn();
+      }
+
       const targetStop = userCoords
         ? {
             centerCoordinate: userCoords,
             zoomLevel: 0.9,
-            animationDuration: 750,
-            animationMode: 'flyTo' as const,
+            animationDuration: QUICK_CENTER_ANIMATION_MS,
+            animationMode: 'easeTo' as const,
           }
         : {
             zoomLevel: 0.9,
-            animationDuration: 750,
-            animationMode: 'flyTo' as const,
+            animationDuration: QUICK_CENTER_ANIMATION_MS,
+            animationMode: 'easeTo' as const,
           };
 
       cameraRef.current.setCamera(targetStop);
@@ -133,14 +144,46 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
     setCameraTriggerKey(key => key + 1);
   }, [userCoords]);
 
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(iconOpacity, {
+        toValue: isFollowingUser ? 0.55 : 1,
+        duration: 160,
+        useNativeDriver: true,
+      }),
+      Animated.spring(iconScale, {
+        toValue: isFollowingUser ? 0.88 : 1,
+        friction: 7,
+        tension: 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [iconOpacity, iconScale, isFollowingUser]);
+
   const handleCameraChanged = useCallback(
     (state: MapState) => {
-      if (!isFollowingUser) return;
-      if (state?.gestures?.isGestureActive) {
-        setIsFollowingUser(false);
+      const gestureActive = Boolean(state?.gestures?.isGestureActive);
+      if (gestureActive) {
+        if (isFollowingUser) {
+          setIsFollowingUser(false);
+        }
+        return;
+      }
+
+      if (!userCoords || isFollowingUser) return;
+
+      const center = state?.properties?.center;
+      if (!Array.isArray(center) || center.length < 2) return;
+
+      const [lon, lat] = center;
+      if (typeof lon !== 'number' || typeof lat !== 'number') return;
+
+      const delta = Math.hypot(lon - userCoords[0], lat - userCoords[1]);
+      if (delta <= LOCATION_SNAP_DELTA) {
+        setIsFollowingUser(true);
       }
     },
-    [isFollowingUser],
+    [isFollowingUser, userCoords],
   );
 
   return (
@@ -171,9 +214,9 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
           ref={cameraRef}
           followZoomLevel={isFollowingUser ? 0.9 : undefined}
           followUserLocation={isFollowingUser}
-          animationMode="flyTo"
+          animationMode="easeTo"
           triggerKey={cameraTriggerKey}
-          animationDuration={750}
+          animationDuration={QUICK_CENTER_ANIMATION_MS}
         />
         <LocationPuck pulsing={{ isEnabled: true }} />
       </MapView>
@@ -187,7 +230,13 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
           pressed && styles.followButtonPressed,
         ]}
       >
-        <Text style={styles.followButtonText}>Mein Standort</Text>
+        <Animated.View style={{ transform: [{ scale: iconScale }], opacity: iconOpacity }}>
+          <MaterialIcons
+            name={isFollowingUser ? 'my-location' : 'location-searching'}
+            size={22}
+            color={isFollowingUser ? 'rgba(31,41,55,0.55)' : 'rgba(37,99,235,0.95)'}
+          />
+        </Animated.View>
       </Pressable>
     </View>
   );
@@ -211,7 +260,6 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   followButtonPressed: { opacity: 0.85 },
-  followButtonText: { color: '#1f2937', fontWeight: '600' },
 });
 
 export default memo(MapComponent);
