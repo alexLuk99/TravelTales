@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, type TextStyle } from 'react-native';
 import Modal from 'react-native-modal';
 
 type Country = {
@@ -37,6 +37,9 @@ function CountryModalBase({
   wantToVisitCountries,
   hideCloseButton,
 }: Props) {
+  const { width } = useWindowDimensions();
+  const isCompact = width < 360;
+
   const visited = useMemo(
     () => !!country && visitedCountries.includes(country.code),
     [visitedCountries, country]
@@ -81,7 +84,7 @@ function CountryModalBase({
             onPress={dismiss}
             accessibilityRole="button"
             accessibilityLabel="Close country details"
-            style={s.closeBtn}
+            style={[s.closeBtn, isCompact && s.closeBtnCompact]}
             hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
           >
             <Text style={s.closeBtnText}>✕</Text>
@@ -90,28 +93,32 @@ function CountryModalBase({
       </View>
 
       {/* Actions */}
-      <View style={s.actions}>
+      <View style={[s.actions, isCompact && s.actionsStacked]}>
         <TouchableOpacity
-          style={[s.actionBtn, visited && s.actionOnVisited]}
+          style={[s.actionBtn, isCompact && s.actionBtnCompact, visited && s.actionOnVisited]}
           onPress={() => { toggleVisited(country.code); dismiss(); }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: visited }}
         >
-          <Text style={[s.actionIcon, s.visitedIcon]}>
-            {visited ? '✓' : '✓'}  {/* Symbol */}
-          </Text>
-          <Text style={[s.actionText, s.visitedText]}>Visited</Text>
+          <View style={[s.actionIconWrap, visited && s.actionIconWrapVisited]}>
+            <Text style={[s.actionIcon, visited && s.actionIconOn]}>✓</Text>
+          </View>
+          <Text style={[s.actionText, visited && s.visitedText]}>Visited</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[s.actionBtn, want && s.actionOnWish]}
+          style={[s.actionBtn, isCompact && s.actionBtnCompact, want && s.actionOnWish]}
           onPress={() => {
             toggleWantToVisit(country.code);
             dismiss();
           }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: want }}
         >
-          <Text style={[s.actionIcon, s.wishIcon]}>
-            {want ? '★' : '★'} {/* Symbol */}
-          </Text>
-          <Text style={[s.actionText, s.wishText]}>Wishlist</Text>
+          <View style={[s.actionIconWrap, s.actionIconWrapWish, want && s.actionIconWrapWishOn]}>
+            <Text style={[s.actionIcon, s.actionIconWish, want && s.actionIconWishOn]}>★</Text>
+          </View>
+          <Text style={[s.actionText, want && s.wishText]}>Wishlist</Text>
         </TouchableOpacity>
 
       </View>
@@ -136,12 +143,12 @@ const s = StyleSheet.create({
   box: {
     width: '96%',
     backgroundColor: 'white',
-    borderRadius: 14,
+    borderRadius: 12,
     padding: 10,
     shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.10,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
   },
 
   // Header oben
@@ -150,7 +157,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
-    paddingRight: 45, // Platz für Close-Button
+    paddingRight: 48, // Platz für Close-Button
   },
   centerTitleRow: {
     flexDirection: 'row',
@@ -159,9 +166,9 @@ const s = StyleSheet.create({
     gap: 8,
     maxWidth: '88%',
   },
-  flag: { fontSize: 30, lineHeight: 30 },
+  flag: { fontSize: 26, lineHeight: 28 },
   title: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: '700',
     color: '#111',
     textAlign: 'center',
@@ -172,13 +179,19 @@ const s = StyleSheet.create({
   closeBtn: {
     position: 'absolute',
     right: 0,
+    top: 2,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(17,122,139,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeBtnCompact: {
     top: 4,
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(17,122,139,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   closeBtnText: { fontSize: 18, lineHeight: 20, fontWeight: '700', color: '#117a8b' },
 
@@ -187,37 +200,73 @@ const s = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 12,
-    marginBottom: 12,
+    marginBottom: 14,
+  },
+  actionsStacked: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 10,
   },
   actionBtn: {
-    flexDirection: 'row',       // horizontale Anordnung
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 9,
+    paddingHorizontal: 18,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: '#d6d6d6',
+    backgroundColor: '#fff',
+    minWidth: 136,
+  },
+  actionBtnCompact: {
+    width: '100%',
+    minWidth: 0,
+    alignSelf: 'stretch',
+  },
+  actionIconWrap: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'rgba(17,122,139,0.12)',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,                     // Abstand zwischen Icon & Text
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-    borderRadius: 20,           // runde Chips
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
   },
-  actionIcon: { fontSize: 20,  textAlign: 'center', marginLeft: 2 },
-  actionText: { fontSize: 14, fontWeight: '700' },
+  actionIconWrapVisited: {
+    backgroundColor: 'rgba(17,122,139,0.24)',
+  },
+  actionIconWrapWish: {
+    backgroundColor: 'rgba(244,162,97,0.16)',
+  },
+  actionIconWrapWishOn: {
+    backgroundColor: 'rgba(244,162,97,0.28)',
+  },
+  actionIcon: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#117a8b',
+    lineHeight: 18,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    includeFontPadding: false,
+  } as TextStyle,
+  actionIconOn: { color: '#0a3d47' },
+  actionIconWish: { color: '#ba611f' },
+  actionIconWishOn: { color: '#79320b' },
+  actionText: { fontSize: 14, fontWeight: '700', color: '#303030' },
 
   // Visited-State (blau)
-  visitedText: { color: '#117a8b' },
-  visitedIcon: { color: '#3bb2d0' },
+  visitedText: { color: '#0f5f6d' },
   actionOnVisited: {
-    borderColor: '#3bb2d0',
-    backgroundColor: 'rgba(59,178,208,0.10)',
+    borderColor: '#117a8b',
+    backgroundColor: 'rgba(17,122,139,0.12)',
   },
 
   // Wishlist-State (orange)
-  wishText: { color: '#9a5a27' },
-  wishIcon: { color: '#f4a261' },
+  wishText: { color: '#8d4a1b' },
   actionOnWish: {
     borderColor: '#f4a261',
-    backgroundColor: 'rgba(244,162,97,0.10)',
+    backgroundColor: 'rgba(244,162,97,0.14)',
   },
 
   // Grabber ganz unten
