@@ -283,11 +283,37 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
         onCameraChanged={handleCameraChanged}
       >
         <ShapeSource id="countries-shape-source" shape={featureCollection} onPress={handleOnPress}>
-          <FillLayer id="countries-base-layer" sourceID="countries-shape-source" style={fillLayerStyle} filter={filterWorldView} />
-          <FillLayer id="countries-wishlist-layer" sourceID="countries-shape-source" style={wantLayerStyle} filter={wantFilter} />
-          <FillLayer id="countries-hit-layer" sourceID="countries-shape-source" style={hitLayerStyle} />
-          <FillLayer id="countries-highlight-layer" sourceID="countries-shape-source" style={highlightLayerStyle} filter={highlightFilter} />
-          <LineLayer id="countries-highlight-border" sourceID="countries-shape-source" style={borderLayerStyle} filter={highlightFilter} />
+          <FillLayer
+            id="countries-base-layer"
+            sourceID="countries-shape-source"
+            style={fillLayerStyle}
+            filter={filterWorldView}
+          />
+          {/* keep native city labels visible above the wishlist fill */}
+          <FillLayer
+            id="countries-wishlist-layer"
+            sourceID="countries-shape-source"
+            style={wantLayerStyle}
+            filter={wantFilter}
+            belowLayerID="water"
+          />
+          <FillLayer
+            id="countries-hit-layer"
+            sourceID="countries-shape-source"
+            style={hitLayerStyle}
+          />
+          <FillLayer
+            id="countries-highlight-layer"
+            sourceID="countries-shape-source"
+            style={highlightLayerStyle}
+            filter={highlightFilter}
+          />
+          <LineLayer
+            id="countries-highlight-border"
+            sourceID="countries-shape-source"
+            style={borderLayerStyle}
+            filter={highlightFilter}
+          />
         </ShapeSource>
         <Camera
           ref={cameraRef}

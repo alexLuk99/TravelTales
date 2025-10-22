@@ -34,17 +34,24 @@ export default function Map() {
       setTimeout(() => { closingOverviewRef.current = false; }, 450); // > animationOutTiming
     }, []);
 
-    const fillLayerStyle = useMemo(() => ({
-        fillColor: Palette.skyBlue,
-        fillOpacity: [
-            'case',
-            ['in', ['get', 'iso_a3'], ['literal', visitedCountries.length ? visitedCountries : ['__NONE__']]],
-            0,
-            0.7
-        ],
-        fillOpacityTransition: { duration: 1000 },
-        fillSortKey: ['get', 'fillSortKey'],
-    }), [visitedCountries]);
+    const fillLayerStyle = useMemo(() => {
+        const visitedList = visitedCountries.length ? visitedCountries : ['__NONE__'];
+        const wishlist = wantToVisitCountries.length ? wantToVisitCountries : ['__NONE__'];
+
+        return {
+            fillColor: Palette.skyBlue,
+            fillOpacity: [
+                'case',
+                ['in', ['get', 'iso_a3'], ['literal', visitedList]],
+                0,
+                ['in', ['get', 'iso_a3'], ['literal', wishlist]],
+                0,
+                0.7
+            ],
+            fillOpacityTransition: { duration: 1000 },
+            fillSortKey: ['get', 'fillSortKey'],
+        };
+    }, [visitedCountries, wantToVisitCountries]);
 
     const filterWorldView = useMemo(() => ([
         'all',
