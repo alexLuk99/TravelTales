@@ -7,47 +7,36 @@ import CountryModal from './CountryModal';
 import MapComponent from './MapComponent';
 import StatisticsComponent from './StatisticsComponent';
 import * as Haptics from 'expo-haptics';
-import OverviewModal from './OverviewModal';
-import { COUNTRY_SECTIONS  } from '@/components/data/countries';
-import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
 import Coachmark from './Coachmark';
 import { Palette } from '@/constants/Colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useStampbook } from '@/hooks/useStampbook';
+import { useRouter } from 'expo-router';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 const SEEN_COACHMARK_KEY = 'seenCoachmarkV1';
 
 export default function Map() {
-    const { location, errorMsg } = useUserLocation();
+    const { location } = useUserLocation();
+    const router = useRouter();
     const insets = useSafeAreaInsets();
     const bottomInset = Math.max(insets.bottom, 8);
-    const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
-    const [wantToVisitCountries, setWantToVisitCountries] = useState<string[]>([]);
+    const { visitedCountries, wantToVisitCountries, toggleVisited, toggleWishlist, hydrated } = useStampbook();
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [isOverviewOpen, setIsOverviewOpen] = useState(false);
     const [showCoachmark, setShowCoachmark] = useState(false);
-    const closingOverviewRef = useRef(false);
     const insightsLockRef = useRef(false);
-    const openOverview = useCallback(() => setIsOverviewOpen(true), []);
-
-    const closeOverview = useCallback(() => {
-      if (closingOverviewRef.current) return;
-      closingOverviewRef.current = true;
-      setIsOverviewOpen(false);
-      setTimeout(() => { closingOverviewRef.current = false; }, 450); // > animationOutTiming
-    }, []);
 
     const handleOpenInsights = useCallback(() => {
       if (insightsLockRef.current) return;
       insightsLockRef.current = true;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{});
-      openOverview();
-      const UNLOCK_AFTER = 450;
+      router.push('/insights');
+      const UNLOCK_AFTER = 600;
       setTimeout(() => {
         insightsLockRef.current = false;
       }, UNLOCK_AFTER);
-    }, [openOverview]);
+    }, [router]);
 
     const fillLayerStyle = useMemo(() => {
         const visitedList = visitedCountries.length ? visitedCountries : ['__NONE__'];
@@ -74,19 +63,20 @@ export default function Map() {
     ]), []);
 
     useEffect(() => {
+        if (!hydrated) return;
+        let cancelled = false;
         (async () => {
           try {
-            const v = await AsyncStorage.getItem('visitedCountries');
-            const w = await AsyncStorage.getItem('wantToVisitCountries');
             const seen = await AsyncStorage.getItem(SEEN_COACHMARK_KEY);
-            if (v) setVisitedCountries(JSON.parse(v));
-            if (w) setWantToVisitCountries(JSON.parse(w));
-            if (!seen) setShowCoachmark(true); // nur beim ersten Start anzeigen
+            if (!cancelled && !seen) setShowCoachmark(true); // nur beim ersten Start anzeigen
           } catch (e) {
             console.error(e);
           }
         })();
-      }, []);
+        return () => {
+          cancelled = true;
+        };
+      }, [hydrated]);
 
       const dismissCoachmark = useCallback(async () => {
         try {
@@ -100,31 +90,13 @@ export default function Map() {
 
     const toggleVisitedCountry = useCallback((code: string) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(()=>{});
-        setVisitedCountries(prev => {
-          const v = new Set(prev);
-          v.has(code) ? v.delete(code) : v.add(code);
-          return [...v];
-        });
-        setWantToVisitCountries(prev => {
-          const w = new Set(prev);
-          w.delete(code);
-          return [...w];
-        });
-      }, []);
+        toggleVisited(code);
+      }, [toggleVisited]);
     
       const toggleWantToVisitCountry = useCallback((code: string) => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(()=>{});
-        setWantToVisitCountries(prev => {
-          const w = new Set(prev);
-          w.has(code) ? w.delete(code) : w.add(code);
-          return [...w];
-        });
-        setVisitedCountries(prev => {
-          const v = new Set(prev);
-          v.delete(code);
-          return [...v];
-        });
-      }, []);
+        toggleWishlist(code);
+      }, [toggleWishlist]);
 
     const handleCountryClick = (countryCode: string, countryName: string, countryCodeAlpha2: string) => {
         if (selectedCountry && selectedCountry.code === countryCode) {
@@ -135,15 +107,6 @@ export default function Map() {
             setIsModalVisible(true);
         }
     };
-
-    let text = 'Waiting...';
-    if (errorMsg) {
-        text = errorMsg;
-    } else if (location) {
-        text = JSON.stringify(location);
-    }
-
-    useDebouncedPersist(visitedCountries, wantToVisitCountries);
 
     return (
         <View style={styles.root}>
@@ -185,16 +148,6 @@ export default function Map() {
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
             />
-            <OverviewModal 
-                visible={isOverviewOpen}
-                onClose={closeOverview}
-                title="Stampbook Insights"
-                sections={COUNTRY_SECTIONS}
-                visitedCountries={visitedCountries}
-                wantToVisitCountries={wantToVisitCountries}
-                onToggleVisited={(code: string) => { toggleVisitedCountry(code); }}
-                onToggleWishlist={(code: string) => { toggleWantToVisitCountry(code); }}
-           />
         </View>
     );
 }

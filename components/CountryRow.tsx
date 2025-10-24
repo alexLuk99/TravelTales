@@ -1,6 +1,7 @@
 import React, { memo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as Haptics from 'expo-haptics';
 
 import { AlphaPalette, Palette } from "@/constants/Colors";
 
@@ -40,7 +41,10 @@ function CountryRowBase({
 
       <TouchableOpacity
         style={[s.checkbox, visited && s.checkboxOn]}
-        onPress={() => onToggleVisited(code3)}
+        onPress={async () => {
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+          onToggleVisited(code3);
+        }}
         accessibilityRole="button"
         accessibilityLabel={visited ? "Unstamp this country" : "Stamp this country"}
       >
@@ -51,7 +55,10 @@ function CountryRowBase({
 
       <TouchableOpacity
         style={[s.checkbox, wish && s.checkboxWish]}
-        onPress={() => onToggleWishlist(code3)}
+        onPress={async () => {
+          await Haptics.selectionAsync().catch(() => {});
+          onToggleWishlist(code3);
+        }}
         accessibilityRole="button"
         accessibilityLabel={wish ? "Remove from wishlist" : "Add to wishlist"}
       >

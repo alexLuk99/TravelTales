@@ -10,6 +10,7 @@ import 'react-native-reanimated';
 import '@/components/data/countries';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { StampbookProvider } from '@/hooks/useStampbook';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -32,13 +33,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-           <Stack>
-             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-             <Stack.Screen name="+not-found" />
-           </Stack>
-           <StatusBar style="auto" />
-         </ThemeProvider>
-       </GestureHandlerRootView>
+      <StampbookProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="insights" options={{ title: 'Stampbook Insights' }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </StampbookProvider>
+    </GestureHandlerRootView>
   );
 }
