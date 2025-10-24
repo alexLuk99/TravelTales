@@ -41,12 +41,18 @@ function StatisticsComponentBase({
   return (
     <View style={[styles.card, bottomInset ? { paddingBottom: CARD_VERTICAL_PADDING + bottomInset } : null]}>
       <View style={styles.progressRow}>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${Math.max(8, progressRatio * 100)}%` }]} />
-        </View>
         <Text style={styles.progressMeta}>
           {visitedCount}/{TOTAL_COUNTRIES}
         </Text>
+        <View style={styles.progressTrack}>
+          <View
+            style={[
+              styles.progressFill,
+              { width: `${Math.max(5, progressRatio * 100)}%` },
+            ]}
+          />
+          <View style={styles.progressTail} />
+        </View>
       </View>
 
       <View style={styles.statsRow}>
@@ -92,6 +98,7 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: AlphaPalette.overlaySky,
     overflow: 'hidden',
+    position: 'relative',
   },
   progressFill: {
     height: '100%',
@@ -102,6 +109,14 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     color: Palette.slateMuted,
+  },
+  progressTail: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: 6,
+    backgroundColor: AlphaPalette.overlaySky,
   },
   statsRow: {
     flexDirection: 'row',
