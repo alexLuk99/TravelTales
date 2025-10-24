@@ -1,76 +1,70 @@
-import React, { memo, useMemo, useRef, useCallback, useState } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import React, { memo, useMemo } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
-import { Palette } from '@/constants/Colors';
+import { AlphaPalette, Palette } from '@/constants/Colors';
+import { COUNTRIES } from '@/components/data/countries';
 
 const TOTAL_COUNTRIES = 195;
+const CARD_VERTICAL_PADDING = 6;
+const COUNTRY_BY_ISO = new Map(
+  COUNTRIES.map((country) => [country.iso_3166_1_alpha_3, country])
+);
 
 type StatsProps = {
   visitedCountries: string[];
   wantToVisitCountries: string[];
-  onOpenMenu?: () => void;
+  bottomInset?: number;
 };
 
 function StatisticsComponentBase({
   visitedCountries,
   wantToVisitCountries,
-  onOpenMenu,
+  bottomInset = 0,
 }: StatsProps) {
   const visitedCount   = useMemo(() => visitedCountries.length, [visitedCountries]);
   const wishlistCount  = useMemo(() => wantToVisitCountries.length, [wantToVisitCountries]);
-  const percentVisited = useMemo(
-    () => Math.round((visitedCount / TOTAL_COUNTRIES) * 100),
+  const progressRatio = useMemo(
+    () => Math.min(1, visitedCount / TOTAL_COUNTRIES),
     [visitedCount]
   );
-
-  // Entprellen gegen schnelle Mehrfach-Taps
-  const lockRef = useRef(false);
-  const [disabled, setDisabled] = useState(false);
-
-  const handleOpen = useCallback(() => {
-    if (!onOpenMenu) return;
-    if (lockRef.current) return;
-
-    lockRef.current = true;
-    setDisabled(true);
-
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{});
-
-    onOpenMenu();
-
-    // Dauer leicht > Modal animation timings (z. B. 350–450ms)
-    const UNLOCK_AFTER = 450;
-    setTimeout(() => {
-      lockRef.current = false;
-      setDisabled(false);
-    }, UNLOCK_AFTER);
-  }, [onOpenMenu]);
+  const visitedContinents = useMemo(() => {
+    const set = new Set<string>();
+    for (const iso of visitedCountries) {
+      const meta = COUNTRY_BY_ISO.get(iso);
+      if (meta?.continent) {
+        set.add(meta.continent);
+      }
+    }
+    return set.size;
+  }, [visitedCountries]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.statsRow}>
-        <Text style={styles.label}>Visited:</Text>
-        <Text style={styles.visitedNumber}>{visitedCount}</Text>
-        <Text style={styles.totalText}>/ {TOTAL_COUNTRIES}</Text>
-        <Text style={styles.percentText}>({percentVisited}%)</Text>
-        <Text style={styles.wishlistText}>Wishlist: {wishlistCount}</Text>
+    <View style={[styles.card, bottomInset ? { paddingBottom: CARD_VERTICAL_PADDING + bottomInset } : null]}>
+      <View style={styles.progressRow}>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${Math.max(8, progressRatio * 100)}%` }]} />
+        </View>
+        <Text style={styles.progressMeta}>
+          {visitedCount}/{TOTAL_COUNTRIES}
+        </Text>
       </View>
 
-      <Pressable
-        onPress={handleOpen}
-        disabled={!onOpenMenu || disabled}
-        accessibilityRole="button"
-        accessibilityLabel="Open overview"
-        hitSlop={8}
-        style={({ pressed }) => [
-          styles.burgerButton,
-          pressed && styles.burgerPressed,
-          (disabled || !onOpenMenu) && styles.burgerDisabled,
-        ]}
-      >
-        <Text style={styles.burgerIcon}>☰</Text>
-      </Pressable>
+      <View style={styles.statsRow}>
+        <View style={styles.statBlock}>
+          <Text style={styles.label}>Visited</Text>
+          <Text style={[styles.value, styles.visitedValue]}>{visitedCount}</Text>
+        </View>
+        <View style={styles.divider} />
+        <View style={styles.statBlock}>
+          <Text style={styles.label}>Wishlist</Text>
+          <Text style={[styles.value, styles.wishlistValue]}>{wishlistCount}</Text>
+        </View>
+        <View style={styles.statBlock}>
+          <Text style={styles.label}>Continents</Text>
+          <Text style={styles.value}>{visitedContinents}</Text>
+        </View>
+      </View>
+
     </View>
   );
 }
@@ -78,24 +72,56 @@ function StatisticsComponentBase({
 export default memo(StatisticsComponentBase);
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  card: {
     backgroundColor: Palette.white,
-    alignItems: 'flex-end',
-    position: 'relative',
-    justifyContent: 'space-between',
+    borderRadius: 0,
+    paddingHorizontal: 14,
+    paddingVertical: CARD_VERTICAL_PADDING,
+    borderWidth: 0,
     width: '100%',
-    flexDirection: 'row',
   },
-  statsRow: { flexDirection: 'row', alignItems: 'center' },
-  label: { fontSize: 18, fontWeight: 'bold', color: Palette.slate, marginBottom: 4, marginRight: 8 },
-  visitedNumber: { fontSize: 24, fontWeight: 'bold', color: Palette.horizonBlue },
-  totalText: { fontSize: 18, color: Palette.slateMuted, marginHorizontal: 2 },
-  percentText: { fontSize: 12, color: Palette.slateMuted, marginRight: 16, marginTop: 6 },
-  wishlistText: { fontSize: 14, color: Palette.sunsetOrange },
-  burgerButton: { position: 'relative', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 8 },
-  burgerPressed: { opacity: 0.7 },
-  burgerDisabled: { opacity: 0.5 },
-  burgerIcon: { fontSize: 24, fontWeight: 'bold', color: Palette.slate },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  progressTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: AlphaPalette.overlaySky,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: Palette.horizonBlue,
+  },
+  progressMeta: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Palette.slateMuted,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    marginTop: 12,
+  },
+  statBlock: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  label: { fontSize: 12, fontWeight: '700', color: Palette.slateMuted, marginBottom: 4 },
+  value: { fontSize: 24, fontWeight: '800', color: Palette.slate },
+  visitedValue: { color: Palette.horizonBlue },
+  wishlistValue: { color: Palette.sunsetOrange },
+  divider: {
+    width: StyleSheet.hairlineWidth,
+    backgroundColor: Palette.softBorder,
+    opacity: 0.8,
+    alignSelf: 'stretch',
+  },
 });

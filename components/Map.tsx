@@ -1,7 +1,7 @@
 import Mapbox from '@rnmapbox/maps';
 import useUserLocation from "@/hooks/useUserLocation";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountryModal from './CountryModal';
 import MapComponent from './MapComponent';
@@ -12,12 +12,15 @@ import { COUNTRY_SECTIONS  } from '@/components/data/countries';
 import { useDebouncedPersist } from '@/hooks/useDebouncedPersist';
 import Coachmark from './Coachmark';
 import { Palette } from '@/constants/Colors';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 Mapbox.setAccessToken(process.env.EXPO_PUBLIC_MAPBOX_KEY || '');
 const SEEN_COACHMARK_KEY = 'seenCoachmarkV1';
 
 export default function Map() {
     const { location, errorMsg } = useUserLocation();
+    const insets = useSafeAreaInsets();
+    const bottomInset = Math.max(insets.bottom, 8);
     const [visitedCountries, setVisitedCountries] = useState<string[]>([]);
     const [wantToVisitCountries, setWantToVisitCountries] = useState<string[]>([]);
     const [selectedCountry, setSelectedCountry] = useState<{ name_en: string; code: string, iso_3166_1: string } | null>(null);
@@ -25,6 +28,7 @@ export default function Map() {
     const [isOverviewOpen, setIsOverviewOpen] = useState(false);
     const [showCoachmark, setShowCoachmark] = useState(false);
     const closingOverviewRef = useRef(false);
+    const insightsLockRef = useRef(false);
     const openOverview = useCallback(() => setIsOverviewOpen(true), []);
 
     const closeOverview = useCallback(() => {
@@ -33,6 +37,17 @@ export default function Map() {
       setIsOverviewOpen(false);
       setTimeout(() => { closingOverviewRef.current = false; }, 450); // > animationOutTiming
     }, []);
+
+    const handleOpenInsights = useCallback(() => {
+      if (insightsLockRef.current) return;
+      insightsLockRef.current = true;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(()=>{});
+      openOverview();
+      const UNLOCK_AFTER = 450;
+      setTimeout(() => {
+        insightsLockRef.current = false;
+      }, UNLOCK_AFTER);
+    }, [openOverview]);
 
     const fillLayerStyle = useMemo(() => {
         const visitedList = visitedCountries.length ? visitedCountries : ['__NONE__'];
@@ -131,18 +146,28 @@ export default function Map() {
     useDebouncedPersist(visitedCountries, wantToVisitCountries);
 
     return (
-        <View style={{ flex: 1 }}>
-            <MapComponent
-                visitedCountries={visitedCountries}
-                wantToVisitCountries={wantToVisitCountries}
-                handleCountryClick={handleCountryClick}
-                fillLayerStyle={fillLayerStyle}
-                filterWorldView={filterWorldView}
-                country={selectedCountry}
-                isModalVisible={isModalVisible}
-                hideCloseButton={true}
-                location={location}
-            />
+        <View style={styles.root}>
+            <View style={styles.mapSection}>
+              <MapComponent
+                  visitedCountries={visitedCountries}
+                  wantToVisitCountries={wantToVisitCountries}
+                  handleCountryClick={handleCountryClick}
+                  fillLayerStyle={fillLayerStyle}
+                  filterWorldView={filterWorldView}
+                  country={selectedCountry}
+                  isModalVisible={isModalVisible}
+                  hideCloseButton={true}
+                  location={location}
+                  onOpenInsights={handleOpenInsights}
+              />
+            </View>
+            <View style={styles.footer}>
+              <StatisticsComponent
+                  visitedCountries={visitedCountries}
+                  wantToVisitCountries={wantToVisitCountries}
+                  bottomInset={bottomInset}
+              />
+            </View>
             <Coachmark
                 visible={showCoachmark}
                 onDismiss={dismissCoachmark}
@@ -160,15 +185,10 @@ export default function Map() {
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
             />
-            <StatisticsComponent
-                visitedCountries={visitedCountries}
-                wantToVisitCountries={wantToVisitCountries}
-                onOpenMenu={openOverview}
-            />
             <OverviewModal 
                 visible={isOverviewOpen}
                 onClose={closeOverview}
-                title="Overview"
+                title="Travel Insights"
                 sections={COUNTRY_SECTIONS}
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}
@@ -178,3 +198,13 @@ export default function Map() {
         </View>
     );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1 },
+  mapSection: { flex: 1 },
+  footer: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
+    backgroundColor: Palette.white,
+  },
+});

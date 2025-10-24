@@ -40,9 +40,10 @@ type MapComponentProps = {
   visitedCountries?: string[];
   location: LocationObject | null;
   hideCloseButton?: boolean;
+  onOpenInsights?: () => void;
 };
 
-const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries, location }: MapComponentProps) => {
+const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, country, isModalVisible, wantToVisitCountries, location, onOpenInsights }: MapComponentProps) => {
   const [loaded, setLoaded] = useState(false);
   const [isFollowingUser, setIsFollowingUser] = useState(true);
   const [cameraTriggerKey, setCameraTriggerKey] = useState(0);
@@ -325,6 +326,24 @@ const MapComponent = ({ handleCountryClick, fillLayerStyle, filterWorldView, cou
         />
         <LocationPuck pulsing={{ isEnabled: true }} />
       </MapView>
+      {onOpenInsights ? (
+        <Pressable
+          onPress={onOpenInsights}
+          accessibilityRole="button"
+          accessibilityLabel="Mehr Reise-Insights anzeigen"
+          hitSlop={10}
+          style={({ pressed }) => [
+            styles.insightsButton,
+            pressed && styles.insightsButtonPressed,
+          ]}
+        >
+          <MaterialIcons
+            name="insights"
+            size={22}
+            color={Palette.horizonBlue}
+          />
+        </Pressable>
+      ) : null}
       <Pressable
         onPress={handleFollowUser}
         accessibilityRole="button"
@@ -365,6 +384,21 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   followButtonPressed: { opacity: 0.85 },
+  insightsButton: {
+    position: 'absolute',
+    bottom: 24,
+    left: 16,
+    backgroundColor: AlphaPalette.overlayWhite,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 20,
+    shadowColor: Palette.shadow,
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  insightsButtonPressed: { opacity: 0.85 },
 });
 
 export default memo(MapComponent);
