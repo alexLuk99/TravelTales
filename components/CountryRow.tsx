@@ -1,5 +1,6 @@
 import React, { memo } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 import { AlphaPalette, Palette } from "@/constants/Colors";
 
@@ -43,7 +44,9 @@ function CountryRowBase({
         accessibilityRole="button"
         accessibilityLabel={visited ? "Unstamp this country" : "Stamp this country"}
       >
-        <Text style={s.checkboxText}>{visited ? "\u2714" : ""}</Text>
+        {visited ? (
+          <FontAwesome5 name="stamp" size={14} color={Palette.horizonBlue} />
+        ) : null}
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -81,6 +84,5 @@ const s = StyleSheet.create({
   },
   checkboxOn: { borderColor: Palette.horizonBlue, backgroundColor: AlphaPalette.overlaySky },
   checkboxWish: { borderColor: Palette.sunsetOrange, backgroundColor: AlphaPalette.overlaySun },
-  checkboxText: { fontSize: 16, color: Palette.horizonBlue },
   checkboxWishText: { fontSize: 16, color: Palette.sunsetOrange },
 });

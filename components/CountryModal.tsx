@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions, type TextStyle } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import Modal from 'react-native-modal';
 
 import { AlphaPalette, Palette } from '@/constants/Colors';
@@ -104,7 +105,11 @@ function CountryModalBase({
           accessibilityState={{ selected: stamped }}
         >
           <View style={[s.actionIconWrap, stamped && s.actionIconWrapStamped]}>
-            <Text style={[s.actionIcon, stamped && s.actionIconOn]}>{'\u2714'}</Text>
+            <FontAwesome5
+              name="stamp"
+              size={16}
+              color={stamped ? Palette.brandNavy : Palette.horizonBlue}
+            />
           </View>
           <Text style={[s.actionText, stamped && s.stampedText]}>
             {stamped ? 'Stamped' : 'Stamp it!'}
