@@ -258,12 +258,12 @@ function OverviewModalBase({
 
   const remainingMessage = useMemo(() => {
     if (remainingCountries <= 0) {
-      return 'All countries checked off - what a journey!';
+      return 'Every country stamped - what a journey!';
     }
     if (remainingCountries === 1) {
-      return 'Just 1 country left to complete the world tour.';
+      return 'Just 1 country left to stamp your world map.';
     }
-    return `${remainingCountries} countries left to finish the world tour.`;
+    return `${remainingCountries} countries left to stamp on your world map.`;
   }, [remainingCountries]);
 
   return (
@@ -291,30 +291,30 @@ function OverviewModalBase({
             <View style={s.grabber} />
           </View>
           <View style={s.header}>
-            <Text style={s.title}>{title ?? 'Overview'}</Text>
+            <Text style={s.title}>{title ?? 'Stampbook Overview'}</Text>
             <TouchableOpacity
               onPress={closeModal}
               style={s.closeBtn}
               accessibilityRole="button"
-              accessibilityLabel="Close overview"
+              accessibilityLabel="Close stampbook overview"
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
-              <Text style={s.closeBtnText}>✕</Text>
+              <Text style={s.closeBtnText}>{"\u2715"}</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={s.summary}>
-          <Text style={s.sectionHeading}>Travel Highlights</Text>
+          <Text style={s.sectionHeading}>Stampbook Highlights</Text>
           <View style={s.summaryRow}>
             <View style={[s.summaryCard, s.summaryCardSpacer]}>
-              <Text style={[s.summaryValue, s.summaryVisited]}>{visitedCountries.length}</Text>
-              <Text style={s.summaryLabel}>Countries explored</Text>
+              <Text style={[s.summaryValue, s.summaryStamped]}>{visitedCountries.length}</Text>
+              <Text style={s.summaryLabel}>Countries stamped</Text>
               <Text style={s.summaryFootnote}>of {totalCountries}</Text>
             </View>
             <View style={[s.summaryCard, s.summaryCardSpacer]}>
               <Text style={s.summaryValue}>{visitedContinentsCount}</Text>
-              <Text style={s.summaryLabel}>Continents reached</Text>
+              <Text style={s.summaryLabel}>Continents with stamps</Text>
               <Text style={s.summaryFootnote}>of {sections.length}</Text>
             </View>
             <View style={s.summaryCard}>
@@ -332,7 +332,7 @@ function OverviewModalBase({
             {mostVisitedContinent ? (
               <View style={s.highlightPill}>
                 <Text style={s.highlightPillText}>
-                  Momentum: {mostVisitedContinent.title} ({mostVisitedContinent.visited})
+                  Stamp momentum: {mostVisitedContinent.title} ({mostVisitedContinent.visited})
                 </Text>
               </View>
             ) : null}
@@ -351,7 +351,7 @@ function OverviewModalBase({
             onPress={() => setFilterMode('visited')}
           >
             <Text style={[s.filterText, filterMode === 'visited' && s.filterTextOn]}>
-              Visited ({visitedCountries.length})
+              Stamped ({visitedCountries.length})
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -435,7 +435,7 @@ const s = StyleSheet.create({
   },
   summaryCardSpacer: { marginRight: 8 },
   summaryValue: { fontSize: 20, fontWeight: '700', color: Palette.slate, marginBottom: 4 },
-  summaryVisited: { color: Palette.horizonBlue },
+  summaryStamped: { color: Palette.horizonBlue },
   summaryWishlist: { color: Palette.sunsetOrange },
   summaryLabel: { fontSize: 12, fontWeight: '600', color: Palette.slateMuted },
   summaryFootnote: { fontSize: 11, color: Palette.slateMuted },

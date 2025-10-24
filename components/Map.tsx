@@ -171,9 +171,9 @@ export default function Map() {
             <Coachmark
                 visible={showCoachmark}
                 onDismiss={dismissCoachmark}
-                title="Welcome aboard"
-                text="Tap a country to capture places you've visited or earmark dream destinations for your wishlist."
-                ctaLabel="Start exploring"
+                title="Welcome to your Stampbook"
+                text="Tap a country to stamp the places you've already explored and earmark new adventures for your wishlist."
+                ctaLabel="Start stamping"
             />
             <CountryModal
                 isVisible={isModalVisible}
@@ -188,7 +188,7 @@ export default function Map() {
             <OverviewModal 
                 visible={isOverviewOpen}
                 onClose={closeOverview}
-                title="Travel Insights"
+                title="Stampbook Insights"
                 sections={COUNTRY_SECTIONS}
                 visitedCountries={visitedCountries}
                 wantToVisitCountries={wantToVisitCountries}

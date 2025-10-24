@@ -21,13 +21,13 @@ function StatisticsComponentBase({
   wantToVisitCountries,
   bottomInset = 0,
 }: StatsProps) {
-  const visitedCount   = useMemo(() => visitedCountries.length, [visitedCountries]);
+  const stampedCount   = useMemo(() => visitedCountries.length, [visitedCountries]);
   const wishlistCount  = useMemo(() => wantToVisitCountries.length, [wantToVisitCountries]);
   const progressRatio = useMemo(
-    () => Math.min(1, visitedCount / TOTAL_COUNTRIES),
-    [visitedCount]
+    () => Math.min(1, stampedCount / TOTAL_COUNTRIES),
+    [stampedCount]
   );
-  const visitedContinents = useMemo(() => {
+  const stampedContinents = useMemo(() => {
     const set = new Set<string>();
     for (const iso of visitedCountries) {
       const meta = COUNTRY_BY_ISO.get(iso);
@@ -42,7 +42,7 @@ function StatisticsComponentBase({
     <View style={[styles.card, bottomInset ? { paddingBottom: CARD_VERTICAL_PADDING + bottomInset } : null]}>
       <View style={styles.progressRow}>
         <Text style={styles.progressMeta}>
-          {visitedCount}/{TOTAL_COUNTRIES}
+          {stampedCount}/{TOTAL_COUNTRIES}
         </Text>
         <View style={styles.progressTrack}>
           <View
@@ -57,8 +57,8 @@ function StatisticsComponentBase({
 
       <View style={styles.statsRow}>
         <View style={styles.statBlock}>
-          <Text style={styles.label}>Visited</Text>
-          <Text style={[styles.value, styles.visitedValue]}>{visitedCount}</Text>
+          <Text style={styles.label}>Stamped</Text>
+          <Text style={[styles.value, styles.stampedValue]}>{stampedCount}</Text>
         </View>
         <View style={styles.divider} />
         <View style={styles.statBlock}>
@@ -67,7 +67,7 @@ function StatisticsComponentBase({
         </View>
         <View style={styles.statBlock}>
           <Text style={styles.label}>Continents</Text>
-          <Text style={styles.value}>{visitedContinents}</Text>
+          <Text style={styles.value}>{stampedContinents}</Text>
         </View>
       </View>
 
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   label: { fontSize: 12, fontWeight: '700', color: Palette.slateMuted, marginBottom: 4 },
   value: { fontSize: 24, fontWeight: '800', color: Palette.slate },
-  visitedValue: { color: Palette.horizonBlue },
+  stampedValue: { color: Palette.horizonBlue },
   wishlistValue: { color: Palette.sunsetOrange },
   divider: {
     width: StyleSheet.hairlineWidth,

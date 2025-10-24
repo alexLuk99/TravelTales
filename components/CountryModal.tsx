@@ -42,7 +42,7 @@ function CountryModalBase({
   const { width } = useWindowDimensions();
   const isCompact = width < 360;
 
-  const visited = useMemo(
+  const stamped = useMemo(
     () => !!country && visitedCountries.includes(country.code),
     [visitedCountries, country]
   );
@@ -89,7 +89,7 @@ function CountryModalBase({
             style={[s.closeBtn, isCompact && s.closeBtnCompact]}
             hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
           >
-            <Text style={s.closeBtnText}>✕</Text>
+            <Text style={s.closeBtnText}>{"\u2715"}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -97,15 +97,18 @@ function CountryModalBase({
       {/* Actions */}
       <View style={[s.actions, isCompact && s.actionsStacked]}>
         <TouchableOpacity
-          style={[s.actionBtn, isCompact && s.actionBtnCompact, visited && s.actionOnVisited]}
+          style={[s.actionBtn, isCompact && s.actionBtnCompact, stamped && s.actionOnStamped]}
           onPress={() => { toggleVisited(country.code); dismiss(); }}
           accessibilityRole="button"
-          accessibilityState={{ selected: visited }}
+          accessibilityLabel={stamped ? 'Unstamp this country' : 'Stamp this country'}
+          accessibilityState={{ selected: stamped }}
         >
-          <View style={[s.actionIconWrap, visited && s.actionIconWrapVisited]}>
-            <Text style={[s.actionIcon, visited && s.actionIconOn]}>✓</Text>
+          <View style={[s.actionIconWrap, stamped && s.actionIconWrapStamped]}>
+            <Text style={[s.actionIcon, stamped && s.actionIconOn]}>{'\u2714'}</Text>
           </View>
-          <Text style={[s.actionText, visited && s.visitedText]}>Visited</Text>
+          <Text style={[s.actionText, stamped && s.stampedText]}>
+            {stamped ? 'Stamped' : 'Stamp it!'}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -118,7 +121,7 @@ function CountryModalBase({
           accessibilityState={{ selected: want }}
         >
           <View style={[s.actionIconWrap, s.actionIconWrapWish, want && s.actionIconWrapWishOn]}>
-            <Text style={[s.actionIcon, s.actionIconWish, want && s.actionIconWishOn]}>★</Text>
+            <Text style={[s.actionIcon, s.actionIconWish, want && s.actionIconWishOn]}>{'\u2605'}</Text>
           </View>
           <Text style={[s.actionText, want && s.wishText]}>Wishlist</Text>
         </TouchableOpacity>
@@ -234,7 +237,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  actionIconWrapVisited: {
+  actionIconWrapStamped: {
     backgroundColor: AlphaPalette.overlaySkyStrong,
   },
   actionIconWrapWish: {
@@ -257,9 +260,9 @@ const s = StyleSheet.create({
   actionIconWishOn: { color: Palette.brandNavy },
   actionText: { fontSize: 14, fontWeight: '700', color: Palette.slate },
 
-  // Visited-State (blau)
-  visitedText: { color: Palette.horizonBlue },
-  actionOnVisited: {
+  // Stamped-State
+  stampedText: { color: Palette.horizonBlue },
+  actionOnStamped: {
     borderColor: Palette.horizonBlue,
     backgroundColor: AlphaPalette.overlaySky,
   },

@@ -40,22 +40,26 @@ function CountryRowBase({
       <TouchableOpacity
         style={[s.checkbox, visited && s.checkboxOn]}
         onPress={() => onToggleVisited(code3)}
+        accessibilityRole="button"
+        accessibilityLabel={visited ? "Unstamp this country" : "Stamp this country"}
       >
-        <Text style={s.checkboxText}>{visited ? "✓" : ""}</Text>
+        <Text style={s.checkboxText}>{visited ? "\u2714" : ""}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={[s.checkbox, wish && s.checkboxWish]}
         onPress={() => onToggleWishlist(code3)}
+        accessibilityRole="button"
+        accessibilityLabel={wish ? "Remove from wishlist" : "Add to wishlist"}
       >
-        <Text style={s.checkboxWishText}>{wish ? "★" : ""}</Text>
+        <Text style={s.checkboxWishText}>{wish ? "\u2605" : ""}</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
-// Custom comparator: nur neu rendern, wenn sichtbare Inhalte sich ändern.
-// Handler-Identitäten ignorieren wir bewusst.
+// Custom comparator: nur neu rendern, wenn sichtbare Inhalte sich aendern.
+// Handler-Identitaeten ignorieren wir bewusst.
 export default memo(
   CountryRowBase,
   (prev, next) =>
